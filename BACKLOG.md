@@ -10,6 +10,83 @@ Goal: A fully working, containerized and Azure-deployable online shop SPA with p
 - Initialize base React SPA with routing and layout shell.
 - Add `.gitignore`, initial `README`, and basic developer setup instructions.
 
+#### Features and User Stories
+
+**Feature M1-E1-F1: Repository Structure and Base Docs**
+
+- **User Story M1-E1-F1-S1:** As a developer, I want a clear repository structure so that I can easily navigate backend, frontend, and infrastructure code.
+	- Acceptance criteria:
+		- Repository has top-level folders (e.g., `backend/`, `frontend/`, `infra/` or `scripts/`).
+		- `BACKLOG.md` and existing planning files are kept in a consistent location (e.g., root or `.github/`).
+		- Structure is briefly described in the `README`.
+
+- **User Story M1-E1-F1-S2:** As a developer, I want basic documentation so that I know how to get started with the project.
+	- Acceptance criteria:
+		- `README.md` exists with project overview, tech stack, and goals.
+		- `README.md` includes a high-level description of milestones and where to find the backlog.
+		- Contributors can clone the repo and understand where to look for backend and frontend code.
+
+**Feature M1-E1-F2: Backend Skeleton (Flask) and Configuration**
+
+- **User Story M1-E1-F2-S1:** As a developer, I want a minimal Flask application skeleton so that I can add APIs without worrying about basic setup.
+	- Acceptance criteria:
+		- A Flask app is created in `backend/` with an application factory or main app module.
+		- A simple health/check endpoint (e.g., `/health`) responds with 200.
+		- The app can be started locally with a single command (e.g., `flask run` or `python -m backend`).
+
+- **User Story M1-E1-F2-S2:** As a developer, I want centralized configuration management so that environment-specific settings are easy to control.
+	- Acceptance criteria:
+		- Configuration is loaded from environment variables and/or config files.
+		- There is a clear pattern for settings like DB URL, secret keys, and debug flags.
+		- Local configuration example (`.env.example` or similar) is provided.
+
+- **User Story M1-E1-F2-S3:** As a developer, I want backend dependencies defined so that I can install them consistently.
+	- Acceptance criteria:
+		- A dependency file exists for backend (e.g., `backend/requirements.txt` or `pyproject.toml`).
+		- It includes Flask and any other core libraries needed for the skeleton.
+		- Installation instructions for backend dependencies are in the `README`.
+
+**Feature M1-E1-F3: Frontend React SPA Skeleton**
+
+- **User Story M1-E1-F3-S1:** As a user, I want to see a basic web UI so that I know the application is running.
+	- Acceptance criteria:
+		- React SPA is bootstrapped in `frontend/` (e.g., Vite or CRA).
+		- Opening the app in the browser shows a simple home page with a placeholder message (e.g., "ML Recommender Shop").
+
+- **User Story M1-E1-F3-S2:** As a developer, I want routing set up in the SPA so that I can easily add new pages later.
+	- Acceptance criteria:
+		- Client-side routing is configured (e.g., React Router).
+		- At least two routes exist (e.g., `/` and `/placeholder-catalog`).
+		- Navigating between routes works without full page reloads.
+
+- **User Story M1-E1-F3-S3:** As a developer, I want frontend dependencies and scripts defined so that I can run and build the SPA consistently.
+	- Acceptance criteria:
+		- `frontend/package.json` defines scripts for `dev`, `build`, and `test` (even if tests are placeholders).
+		- `npm install` or `pnpm install` sets up all required dependencies.
+		- `README` documents how to run the frontend in development mode.
+
+**Feature M1-E1-F4: Development Environment & Tooling**
+
+- **User Story M1-E1-F4-S1:** As a developer, I want a standard `.gitignore` so that unnecessary files are not committed to the repository.
+	- Acceptance criteria:
+		- `.gitignore` exists at the repo root.
+		- It covers Python, Node/React, IDE, and OS-specific files (e.g., `__pycache__`, `node_modules`, `.env`, `.vscode`).
+
+- **User Story M1-E1-F4-S2:** As a developer, I want a straightforward local setup process so that I can get the app running quickly.
+	- Acceptance criteria:
+		- `README` includes step-by-step instructions to:
+			- Clone the repo.
+			- Set up backend environment and install dependencies.
+			- Set up frontend environment and install dependencies.
+			- Run backend and frontend together in dev mode (even if separate commands).
+		- The steps are tested and known to work on the target environment (Windows + pwsh).
+
+- **User Story M1-E1-F4-S3:** As a developer, I want basic formatting/linting scripts so that the codebase stays reasonably clean.
+	- Acceptance criteria:
+		- Chosen tools are documented (e.g., `black` for Python, `eslint`/`prettier` for JS/TS).
+		- Simple commands exist to run them (e.g., `make format`, `npm run lint`, or documented equivalent).
+		- It is clear which tools are recommended vs optional for this learning project.
+
 ### Epic M1-E2: Database Schema & Seeded Catalog
 - Design PostgreSQL schema for users, products, carts, cart items, orders (basic), and interactions.
 - Set up database migrations (e.g., Alembic) for schema management.
