@@ -74,7 +74,7 @@ def parse_backlog_md(path: str) -> Dict[str, Any]:
                 continue
 
             # User Story (bold markdown pattern: - **User Story ...:**)
-            story_match = re.match(r'^-\s+\*\*User Story ([^:]+):\*\*(.*)$', stripped)
+            story_match = re.match(r'^-\s*\*\*User Story ([^:]+):\*\*(.*)$', stripped)
             if story_match and current_feature:
                 story_id = story_match.group(1).strip()
                 story_desc = story_match.group(2).strip()
@@ -117,10 +117,12 @@ def parse_backlog_md(path: str) -> Dict[str, Any]:
             e["body"] = "\n".join(e.get("body_lines", []))
             e.pop("body_lines", None)
             for f in e["features"]:
-                f["body"] = f"{f['description']}\n\n" + "\n".join(f.get("body_lines", []))
+                body_content = "\n".join(f.get("body_lines", []))
+                f["body"] = f"{f['description']}\n\n{body_content}" if body_content else f['description']
                 f.pop("body_lines", None)
                 for s in f["user_stories"]:
-                    s["body"] = f"{s['description']}\n\n" + "\n".join(s.get("body_lines", []))
+                    body_content = "\n".join(s.get("body_lines", []))
+                    s["body"] = f"{s['description']}\n\n{body_content}" if body_content else s['description']
                     s.pop("body_lines", None)
 
     return {"milestones": milestones}
