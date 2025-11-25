@@ -1,8 +1,11 @@
 import os
 import re
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 import requests
+
+# Markdown header level for "Features and User Stories" section
+SECTION_HEADER = "####"
 
 
 def parse_backlog_md(path: str) -> Dict[str, Any]:
@@ -87,15 +90,15 @@ def parse_backlog_md(path: str) -> Dict[str, Any]:
             # Plain text: collect as body lines
             if current_user_story is not None:
                 # Inside a user story
-                if stripped and not stripped.startswith("####"):
+                if stripped and not stripped.startswith(SECTION_HEADER):
                     current_user_story["body_lines"].append(stripped)
             elif current_feature is not None:
                 # Inside a feature but not in a user story
-                if stripped and not stripped.startswith("####"):
+                if stripped and not stripped.startswith(SECTION_HEADER):
                     current_feature["body_lines"].append(stripped)
             elif current_epic is not None:
                 # Inside an epic but not in a feature
-                if stripped and not stripped.startswith("####"):
+                if stripped and not stripped.startswith(SECTION_HEADER):
                     current_epic["body_lines"].append(stripped)
             elif current_milestone and not current_epic:
                 # Part of milestone description
@@ -136,6 +139,15 @@ def create_milestone(session: requests.Session, owner: str, repo: str, title: st
     return data["number"]
 
 
+def add_parent_references(body: str, epic_number: Optional[int] = None, feature_number: Optional[int] = None) -> str:
+    """Add parent issue references to the body text."""
+    if feature_number:
+        body += f"\n\nRelated to feature: #{feature_number}"
+    if epic_number:
+        body += f"\nRelated to epic: #{epic_number}"
+    return body
+
+
 def create_issue(session: requests.Session, owner: str, repo: str, title: str, body: str, milestone_number: int, labels: List[str]) -> int:
     url = f"https://api.github.com/repos/{owner}/{repo}/issues"
     payload: Dict[str, Any] = {
@@ -163,16 +175,17 @@ def main() -> None:
     parsed = parse_backlog_md(backlog_path)
     milestones = parsed["milestones"]
 
-    session = requests.Session()
-    session.headers.update({
-        "Authorization": f"Bearer {token}",
-        "Accept": "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-    })
-
     print(f"Found {len(milestones)} milestones in {backlog_path}")
     if dry_run:
         print("\n*** DRY RUN MODE - No issues will be created ***\n")
+        session = None
+    else:
+        session = requests.Session()
+        session.headers.update({
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        })
 
     for m in milestones:
         m_title = m["title"]
@@ -208,8 +221,8 @@ def main() -> None:
             for f in e.get("features", []):
                 f_title = f["title"]
                 f_body = f.get("body", "")
-                if epic_issue_number and not dry_run:
-                    f_body += f"\n\nRelated to epic: #{epic_issue_number}"
+                if not dry_run:
+                    f_body = add_parent_references(f_body, epic_number=epic_issue_number)
                 
                 print(f"    Feature: {f_title}")
                 
@@ -232,10 +245,8 @@ def main() -> None:
                 for s in f.get("user_stories", []):
                     s_title = s["title"]
                     s_body = s.get("body", "")
-                    if feature_issue_number and not dry_run:
-                        s_body += f"\n\nRelated to feature: #{feature_issue_number}"
-                    if epic_issue_number and not dry_run:
-                        s_body += f"\nRelated to epic: #{epic_issue_number}"
+                    if not dry_run:
+                        s_body = add_parent_references(s_body, epic_number=epic_issue_number, feature_number=feature_issue_number)
                     
                     print(f"      User Story: {s_title}")
                     
