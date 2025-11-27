@@ -95,7 +95,7 @@
                   "title": "Set up Alembic migrations and database connection",
                   "description": "As a developer, I want to manage schema changes via migrations, so that database state can be reproduced and evolved safely.\n\nAcceptance criteria:\n- Alembic (or equivalent) is configured in the backend\n- `upgrade` and `downgrade` commands work against a local PostgreSQL instance\n- Connection settings are read from environment variables",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
               "status": "not-started"
