@@ -155,10 +155,10 @@
                   "title": "Expose endpoint for product details",
                   "description": "As a shopper, I want to see full details for a selected product, so that I can decide whether it meets my needs.\n\nAcceptance criteria:\n- GET /api/products/{id} returns full product information\n- Non-existing product ids return a 404 with an error message\n- Response includes description, category, price, image URL and any available metadata",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             },
             {
               "type": "feature",

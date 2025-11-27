@@ -102,3 +102,12 @@ def list_products():  # type: ignore[override]
             },
         }
     )
+
+
+@products_bp.get("/products/<int:product_id>")
+def get_product(product_id: int):  # type: ignore[override]
+    session = get_session()
+    product = session.get(Product, product_id)
+    if product is None:
+        return {"error": f"Product {product_id} not found"}, 404
+    return jsonify(_serialize_product(product))
