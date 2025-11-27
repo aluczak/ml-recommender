@@ -19,6 +19,9 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .db import Base
+from .typing_compat import ensure_sqlalchemy_typing_compat
+
+ensure_sqlalchemy_typing_compat()
 
 
 class TimestampMixin:

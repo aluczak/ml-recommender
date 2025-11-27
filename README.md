@@ -25,7 +25,7 @@ backlog.json# Structured backlog that mirrors milestones/epics/user stories
 ```
 
 ## Getting Started
-1. Install Python 3.11+, Node.js 20+, Docker Desktop (for containers), and Azure CLI (for later deployment).
+1. Install Python 3.11+ (pyenv defaults to 3.12.2 via `.python-version`; a small compatibility shim keeps SQLAlchemy/Alembic working on Python 3.13/3.14), Node.js 20+, Docker Desktop (for containers), and Azure CLI (for later deployment).
 2. Create a virtual environment inside `.venv` or similar and install backend requirements via `pip install -r requirements.txt -r requirements-dev.txt` (see Backend section below).
 3. Apply the initial Alembic migration (`alembic upgrade head`) so the database schema exists locally.
 4. Inside `frontend/`, install Node dependencies (`npm install`) and run the SPA locally via `npm run dev`.
@@ -62,7 +62,7 @@ flask --app app:create_app --debug run
 # or
 python run.py
 ```
-The Flask app loads configuration from environment variables (optionally via `.env`). Customize `APP_ENV`, `FLASK_DEBUG`, `SECRET_KEY`, or `DATABASE_URL` as needed.
+The Flask app loads configuration from environment variables (optionally via `.env`). Customize `APP_ENV`, `FLASK_DEBUG`, `SECRET_KEY`, or `DATABASE_URL` as needed. A lightweight compatibility shim (`app/typing_compat.py`) patches SQLAlchemy's typing helpers so Alembic continues to run even on Python 3.13/3.14.
 
 ### Database & migrations
 ```
