@@ -87,7 +87,7 @@ python scripts/seed_products.py --reset
 
 ### REST API (dev snapshot)
 - `GET /api/health` – simple service heartbeat
-- `GET /api/products?page=<n>&page_size=<n>&category=<name>&sort_by=name|price&sort_dir=asc|desc` – paginated catalog response with optional category filter and sorting (defaults: page 1, 12 items, sort by name asc)
+- `GET /api/products?page=<n>&page_size=<n>&category=<name>&sort_by=name|price&sort_dir=asc|desc&q=<keywords>` – paginated catalog response with optional search, category filter, and sorting (defaults: page 1, 12 items, sort by name asc). Responses also include `filters.available_categories` so the SPA can render the current taxonomy without hardcoding it.
 - `GET /api/products/{id}` – full details for a single product, returns 404 + error JSON when not found
 - `GET /api/products/{id}/related?limit=<n>` – rule-based related items (same category when possible, otherwise price-proximate fallbacks)
 
@@ -112,6 +112,7 @@ npm run format
 The SPA uses Vite + React Router with a flat-configured ESLint (`eslint.config.js`) and Prettier (`.prettierrc.json`) for consistent code style.
 
 - Frontend reads `VITE_API_BASE_URL` (see `frontend/.env.example`) to decide which backend `/api` host to call. Defaults to `http://localhost:5000/api` for local dev.
+- The catalog route (`/catalog`) now includes a search box, category dropdown, and sort controls; every change re-queries the backend list endpoint so results stay in sync with API capabilities.
 
 ## Next Steps
 - Flesh out catalog/database foundations and initial API endpoints.

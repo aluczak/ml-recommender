@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 
 from flask import Blueprint, jsonify, request
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 
 from ..db import get_session
 from ..models import Product
@@ -51,6 +51,7 @@ def list_products():  # type: ignore[override]
             request.args.get("page_size"), default=12, minimum=1, maximum=100
         )
         category_filter = request.args.get("category")
+        search_term = request.args.get("q")
         sort_by = (request.args.get("sort_by") or "name").lower()
         sort_dir = (request.args.get("sort_dir") or "asc").lower()
     except ValueError as exc:  # pragma: no cover - defensive branch
@@ -71,6 +72,16 @@ def list_products():  # type: ignore[override]
     if sort_dir not in {"asc", "desc"}:
         return {"error": "Invalid sort_dir. Use 'asc' or 'desc'."}, 400
 
+    trimmed_search = search_term.strip() if search_term and search_term.strip() else None
+    if trimmed_search:
+        like_term = f"%{trimmed_search.lower()}%"
+        filters.append(
+            or_(
+                func.lower(Product.name).like(like_term),
+                func.lower(func.coalesce(Product.description, "")).like(like_term),
+            )
+        )
+
     count_stmt = select(func.count()).select_from(Product)
     if filters:
         count_stmt = count_stmt.where(*filters)
@@ -86,6 +97,14 @@ def list_products():  # type: ignore[override]
 
     total_pages = math.ceil(total_items / page_size) if total_items else 0
 
+    categories_stmt = (
+        select(Product.category)
+        .where(Product.category.isnot(None))
+        .distinct()
+        .order_by(Product.category.asc())
+    )
+    categories = session.scalars(categories_stmt).all()
+
     return jsonify(
         {
             "items": [_serialize_product(product) for product in items],
@@ -99,6 +118,10 @@ def list_products():  # type: ignore[override]
                 "sort_by": sort_by,
                 "sort_dir": sort_dir,
                 "category": category_filter,
+                "query": trimmed_search,
+            },
+            "filters": {
+                "available_categories": categories,
             },
         }
     )

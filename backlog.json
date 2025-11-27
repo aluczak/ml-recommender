@@ -223,13 +223,13 @@
                   "title": "Add search input and filters to catalog page",
                   "description": "As a shopper, I want to search and filter products in the UI, so that I can narrow down to products that match my needs.\n\nAcceptance criteria:\n- Search box sends query to the backend list endpoint\n- Category filter and sort controls update the result list\n- Current search and filter state is reflected in the UI",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             }
           ],
-          "status": "in-progress"
+          "status": "completed"
         },
         {
           "type": "epic",
