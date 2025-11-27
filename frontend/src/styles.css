@@ -105,6 +105,24 @@ nav a.active {
   border: 1px solid #cbd5f5;
 }
 
+.status {
+  margin: 1rem 0;
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.status-loading {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.status-error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
 .catalog header {
   margin-bottom: 1.5rem;
 }

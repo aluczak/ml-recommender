@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from flask import Flask
+from flask_cors import CORS
 
 from .config import AppConfig, load_config
 from .db import init_db
@@ -23,6 +24,7 @@ def create_app(config_override: AppConfig | None = None) -> Flask:
     )
     app.config["APP_CONFIG"] = config
     init_db(app, config)
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     app.register_blueprint(health_bp, url_prefix="/api")
     app.register_blueprint(products_bp, url_prefix="/api")

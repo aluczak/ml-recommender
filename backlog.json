@@ -193,10 +193,10 @@
                   "title": "Implement product catalog grid in SPA",
                   "description": "As a shopper, I want to browse products on a catalog page, so that I can quickly scan available items.\n\nAcceptance criteria:\n- Catalog route shows a grid/list of products from the API\n- Each card shows name, price, and image where available\n- Basic loading and error states are visible while fetching data",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             },
             {
               "type": "feature",

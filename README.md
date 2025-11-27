@@ -65,6 +65,8 @@ python run.py
 ```
 The Flask app loads configuration from environment variables (optionally via `.env`). Customize `APP_ENV`, `FLASK_DEBUG`, `SECRET_KEY`, or `DATABASE_URL` as needed. A lightweight compatibility shim (`app/typing_compat.py`) patches SQLAlchemy's typing helpers so Alembic continues to run even on Python 3.13/3.14.
 
+- Cross-origin requests: `flask-cors` is enabled for `/api/*` endpoints by default so the Vite dev server (`http://localhost:5173`) can talk to `http://localhost:5000`. Adjust CORS settings in `app/__init__.py` if you need stricter origins.
+
 ### Database & migrations
 ```
 cd backend
@@ -108,6 +110,8 @@ npm run format:check
 npm run format
 ```
 The SPA uses Vite + React Router with a flat-configured ESLint (`eslint.config.js`) and Prettier (`.prettierrc.json`) for consistent code style.
+
+- Frontend reads `VITE_API_BASE_URL` (see `frontend/.env.example`) to decide which backend `/api` host to call. Defaults to `http://localhost:5000/api` for local dev.
 
 ## Next Steps
 - Flesh out catalog/database foundations and initial API endpoints.
