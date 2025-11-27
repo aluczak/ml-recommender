@@ -3,7 +3,10 @@ name = "ml-recommender-backend"
 version = "0.1.0"
 description = "Backend service for the ML Recommender Shop"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+  "Flask>=3.0,<4.0",
+  "python-dotenv>=1.0,<2.0",
+]
 
 [build-system]
 requires = ["setuptools>=68.0"]
@@ -13,10 +16,12 @@ build-backend = "setuptools.build_meta"
 line-length = 100
 skip-string-normalization = false
 target-version = ["py311"]
-exclude = [
-  "/migrations",
-  "/.venv",
-]
+exclude = '''
+/(
+  migrations
+  |\.venv
+)/
+'''
 
 [tool.ruff]
 line-length = 100
