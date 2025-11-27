@@ -1,0 +1,34 @@
+[project]
+name = "ml-recommender-backend"
+version = "0.1.0"
+description = "Backend service for the ML Recommender Shop"
+requires-python = ">=3.11"
+dependencies = []
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+line-length = 100
+skip-string-normalization = false
+target-version = ["py311"]
+exclude = [
+  "/migrations",
+  "/.venv",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["app", "src"]
+exclude = ["migrations", "tests/fixtures"]
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "I", "W", "UP"]
+ignore = ["E203", "E266", "E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true

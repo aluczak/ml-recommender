@@ -30,8 +30,36 @@ backlog.json# Structured backlog that mirrors milestones/epics/user stories
 3. Inside `frontend/`, initialize the React SPA (Milestone 1 task) and install dependencies with your package manager of choice.
 4. Use `backlog.json` as the single source of truth for upcoming features and track progress via GitHub issues/projects.
 
+## Code Quality & Tooling
+### Backend (Flask)
+```
+cd backend
+python -m venv .venv && .venv\Scripts\activate  # or source .venv/bin/activate on macOS/Linux
+pip install -r requirements-dev.txt
+
+# Check formatting & lint
+black .
+ruff check .
+
+# Autofix lint findings when available
+ruff check . --fix
+```
+Tooling lives in `backend/pyproject.toml`, so IDEs can pick up consistent Black/Ruff settings automatically.
+
+### Frontend (React SPA)
+```
+cd frontend
+npm install
+
+# Run linters / formatters
+npm run lint
+npm run lint:fix
+npm run format:check
+npm run format
+```
+ESLint (`.eslintrc.cjs`) and Prettier (`.prettierrc.json`) are preconfigured for a React + TypeScript stack, enabling consistent code style once the SPA scaffold is in place.
+
 ## Next Steps
 - Bootstrap backend app factory with configuration loading and health endpoint.
 - Scaffold the React SPA with routing and layout.
-- Define coding standards (formatters/linters) for both backend and frontend.
 - Keep updating this README as major components (local orchestration, deployment flows, ML integration) are implemented.
