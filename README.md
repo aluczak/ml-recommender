@@ -87,6 +87,7 @@ python scripts/seed_products.py --reset
 - `GET /api/health` – simple service heartbeat
 - `GET /api/products?page=<n>&page_size=<n>&category=<name>&sort_by=name|price&sort_dir=asc|desc` – paginated catalog response with optional category filter and sorting (defaults: page 1, 12 items, sort by name asc)
 - `GET /api/products/{id}` – full details for a single product, returns 404 + error JSON when not found
+- `GET /api/products/{id}/related?limit=<n>` – rule-based related items (same category when possible, otherwise price-proximate fallbacks)
 
 ### Frontend (React SPA)
 ```

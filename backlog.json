@@ -170,10 +170,10 @@
                   "title": "Return simple related products from API",
                   "description": "As a shopper, I want to see a few related products on the product page, so that I can discover alternatives or complements.\n\nAcceptance criteria:\n- An endpoint or field returns a small list of related items for a given product\n- Related logic is rule-based (e.g., same category or price range)\n- Implementation does not depend on ML yet",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             }
           ],
           "status": "in-progress"

@@ -111,3 +111,43 @@ def get_product(product_id: int):  # type: ignore[override]
     if product is None:
         return {"error": f"Product {product_id} not found"}, 404
     return jsonify(_serialize_product(product))
+
+
+@products_bp.get("/products/<int:product_id>/related")
+def get_related_products(product_id: int):  # type: ignore[override]
+    session = get_session()
+    product = session.get(Product, product_id)
+    if product is None:
+        return {"error": f"Product {product_id} not found"}, 404
+
+    try:
+        limit = _parse_positive_int(
+            request.args.get("limit"), default=4, minimum=1, maximum=24
+        )
+    except ValueError as exc:
+        return {"error": str(exc)}, 400
+
+    base_query = select(Product).where(Product.id != product_id)
+    price_diff = func.abs(Product.price - product.price)
+
+    related: list[Product] = []
+    excluded_ids: set[int] = set()
+
+    if product.category:
+        stmt_category = (
+            base_query.where(Product.category == product.category)
+            .order_by(price_diff, Product.id.asc())
+            .limit(limit)
+        )
+        related = session.scalars(stmt_category).all()
+        excluded_ids.update(item.id for item in related)
+
+    if len(related) < limit:
+        remaining = limit - len(related)
+        stmt_fallback = base_query
+        if excluded_ids:
+            stmt_fallback = stmt_fallback.where(~Product.id.in_(excluded_ids))
+        stmt_fallback = stmt_fallback.order_by(price_diff, Product.id.asc()).limit(remaining)
+        related.extend(session.scalars(stmt_fallback).all())
+
+    return jsonify({"items": [_serialize_product(item) for item in related]})
