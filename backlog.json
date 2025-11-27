@@ -208,10 +208,10 @@
                   "title": "Implement product detail view",
                   "description": "As a shopper, I want to see key details for a selected product, so that I can decide whether to add it to my cart.\n\nAcceptance criteria:\n- Detail route fetches product info by id from the backend\n- Page shows main details and an add-to-cart action\n- Page shows a placeholder area for recommendations/related products",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             },
             {
               "type": "feature",
@@ -229,7 +229,7 @@
               "status": "not-started"
             }
           ],
-          "status": "not-started"
+          "status": "in-progress"
         },
         {
           "type": "epic",

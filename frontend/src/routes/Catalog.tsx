@@ -1,23 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { API_BASE_URL } from "../config";
+import { formatPrice } from "../utils/format";
+import type { Product } from "../types/product";
 
-type Product = {
-  id: number;
-  name: string;
-  description: string;
-  category: string | null;
-  price: number;
-  currency: string;
-  image_url: string | null;
-};
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5000/api";
 const PAGE_SIZE = 12;
-
-const formatPrice = (amount: number, currency: string) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: currency || "USD",
-  }).format(amount);
 
 const Catalog = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -89,22 +76,22 @@ const Catalog = () => {
         <div className="grid">
           {products.map((product) => (
             <article className="card" key={product.id}>
-              <img
-                src={product.image_url || "https://placehold.co/600x400?text=Product"}
-                alt={product.name}
-                loading="lazy"
-              />
-              <div className="card-body">
-                <p className="card-category">{product.category ?? "Uncategorized"}</p>
-                <h3>{product.name}</h3>
-                <p className="card-description">{product.description}</p>
-                <div className="card-footer">
-                  <span className="price">{formatPrice(product.price, product.currency)}</span>
-                  <button type="button" className="button button-ghost" disabled>
-                    Add to cart
-                  </button>
+              <Link to={`/catalog/${product.id}`} className="card-link" aria-label={`View ${product.name}`}>
+                <img
+                  src={product.image_url || "https://placehold.co/600x400?text=Product"}
+                  alt={product.name}
+                  loading="lazy"
+                />
+                <div className="card-body">
+                  <p className="card-category">{product.category ?? "Uncategorized"}</p>
+                  <h3>{product.name}</h3>
+                  <p className="card-description">{product.description}</p>
+                  <div className="card-footer">
+                    <span className="price">{formatPrice(product.price, product.currency)}</span>
+                    <span className="card-link-hint">View details →</span>
+                  </div>
                 </div>
-              </div>
+              </Link>
             </article>
           ))}
         </div>
