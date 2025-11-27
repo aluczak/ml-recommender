@@ -57,10 +57,10 @@
                   "title": "Initialize React SPA with routing",
                   "description": "As a user, I want to load the shop UI from a single-page application, so that navigation feels fast and modern.\n\nAcceptance criteria:\n- React app builds and runs locally\n- Client-side routing is configured for at least home and catalog routes\n- A basic layout (header/content/footer) is visible",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             }
           ],
           "status": "not-started"

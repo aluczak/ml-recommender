@@ -27,7 +27,7 @@ backlog.json# Structured backlog that mirrors milestones/epics/user stories
 ## Getting Started
 1. Install Python 3.11+, Node.js 20+, Docker Desktop (for containers), and Azure CLI (for later deployment).
 2. Create a virtual environment inside `.venv` or similar and install backend requirements via `pip install -r requirements.txt -r requirements-dev.txt` (see Backend section below).
-3. Inside `frontend/`, initialize the React SPA (Milestone 1 task) and install dependencies with your package manager of choice.
+3. Inside `frontend/`, install Node dependencies (`npm install`) and run the SPA locally via `npm run dev`.
 4. Use `backlog.json` as the single source of truth for upcoming features and track progress via GitHub issues/projects.
 
 ## Code Quality & Tooling
@@ -68,15 +68,21 @@ The Flask app loads configuration from environment variables (optionally via `.e
 cd frontend
 npm install
 
+# Run the Vite dev server (http://localhost:5173)
+npm run dev
+
+# Build & preview production assets
+npm run build
+npm run preview
+
 # Run linters / formatters
 npm run lint
 npm run lint:fix
 npm run format:check
 npm run format
 ```
-ESLint (`.eslintrc.cjs`) and Prettier (`.prettierrc.json`) are preconfigured for a React + TypeScript stack, enabling consistent code style once the SPA scaffold is in place.
+The SPA uses Vite + React Router with a flat-configured ESLint (`eslint.config.js`) and Prettier (`.prettierrc.json`) for consistent code style.
 
 ## Next Steps
-- Scaffold the React SPA with routing and layout.
 - Flesh out catalog/database foundations and initial API endpoints.
 - Keep updating this README as major components (local orchestration, deployment flows, ML integration) are implemented.

@@ -21,8 +21,8 @@ ruff_cache/
 
 # Node / Frontend
 node_modules/
-build/
-dist/
+**/build/
+**/dist/
 coverage/
 .npm/
 .npmrc
@@ -30,6 +30,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .eslintcache
+*.tsbuildinfo
 
 # IDE / Editor
 .vscode/
