@@ -28,8 +28,9 @@ backlog.json# Structured backlog that mirrors milestones/epics/user stories
 1. Install Python 3.11+ (pyenv defaults to 3.12.2 via `.python-version`; a small compatibility shim keeps SQLAlchemy/Alembic working on Python 3.13/3.14), Node.js 20+, Docker Desktop (for containers), and Azure CLI (for later deployment).
 2. Create a virtual environment inside `.venv` or similar and install backend requirements via `pip install -r requirements.txt -r requirements-dev.txt` (see Backend section below).
 3. Apply the initial Alembic migration (`alembic upgrade head`) so the database schema exists locally.
-4. Inside `frontend/`, install Node dependencies (`npm install`) and run the SPA locally via `npm run dev`.
-5. Use `backlog.json` as the single source of truth for upcoming features and track progress via GitHub issues/projects.
+4. Seed the catalog with curated sample products (`python scripts/seed_products.py --reset` from the `backend/` folder) so the UI/API have data to display.
+5. Inside `frontend/`, install Node dependencies (`npm install`) and run the SPA locally via `npm run dev`.
+6. Use `backlog.json` as the single source of truth for upcoming features and track progress via GitHub issues/projects.
 
 ## Code Quality & Tooling
 ### Backend (Flask)
@@ -72,6 +73,15 @@ alembic revision -m "describe change" --autogenerate  # Generate new migration
 ```
 - Default dev database is SQLite at `backend/instance/app.db`; override `DATABASE_URL` for PostgreSQL (e.g., `postgresql+psycopg://user:pass@localhost:5432/mlshop`).
 - Delete `instance/app.db` and rerun `alembic upgrade head` if you want a clean slate locally.
+
+### Sample data seeding
+```
+cd backend
+source .venv/bin/activate  # or .venv\Scripts\activate on Windows
+python scripts/seed_products.py --reset
+```
+- `--reset` clears any existing products before inserting the curated dataset; omit the flag to upsert without deleting.
+- Seed data is defined in `app/data/sample_products.py` and covers multiple categories/price ranges for UI and ML experimentation.
 
 ### Frontend (React SPA)
 ```

@@ -110,7 +110,7 @@
                   "title": "Seed database with sample products",
                   "description": "As a learner, I want a realistic product catalog available out-of-the-box, so that I can experiment with browsing and recommendations.\n\nAcceptance criteria:\n- A seed script exists that populates the products table with sample data\n- Sample data covers multiple categories and price ranges\n- Running the seed script can be done with a simple documented command",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
               "status": "not-started"
