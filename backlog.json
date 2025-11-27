@@ -140,10 +140,10 @@
                   "title": "Support basic sorting and filtering on product list",
                   "description": "As a shopper, I want to sort and filter the catalog by basic attributes, so that I can focus on relevant products.\n\nAcceptance criteria:\n- Endpoint supports sorting by price and name\n- Endpoint supports filtering by category\n- Invalid parameters are validated and return helpful errors",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "in-progress"
+              "status": "completed"
             },
             {
               "type": "feature",

@@ -85,7 +85,7 @@ python scripts/seed_products.py --reset
 
 ### REST API (dev snapshot)
 - `GET /api/health` – simple service heartbeat
-- `GET /api/products?page=<n>&page_size=<n>` – paginated catalog response with metadata (defaults: page 1, 12 items)
+- `GET /api/products?page=<n>&page_size=<n>&category=<name>&sort_by=name|price&sort_dir=asc|desc` – paginated catalog response with optional category filter and sorting (defaults: page 1, 12 items, sort by name asc)
 
 ### Frontend (React SPA)
 ```

@@ -50,18 +50,38 @@ def list_products():  # type: ignore[override]
         page_size = _parse_positive_int(
             request.args.get("page_size"), default=12, minimum=1, maximum=100
         )
+        category_filter = request.args.get("category")
+        sort_by = (request.args.get("sort_by") or "name").lower()
+        sort_dir = (request.args.get("sort_dir") or "asc").lower()
     except ValueError as exc:  # pragma: no cover - defensive branch
         return {"error": str(exc)}, 400
 
-    total_items = session.scalar(select(func.count()).select_from(Product)) or 0
+    filters = []
+    if category_filter and category_filter.strip():
+        filters.append(Product.category == category_filter.strip())
+
+    sort_columns = {
+        "name": Product.name,
+        "price": Product.price,
+    }
+    sort_column = sort_columns.get(sort_by)
+    if sort_column is None:
+        return {"error": "Invalid sort_by. Use 'name' or 'price'."}, 400
+
+    if sort_dir not in {"asc", "desc"}:
+        return {"error": "Invalid sort_dir. Use 'asc' or 'desc'."}, 400
+
+    count_stmt = select(func.count()).select_from(Product)
+    if filters:
+        count_stmt = count_stmt.where(*filters)
+    total_items = session.scalar(count_stmt) or 0
     offset = (page - 1) * page_size
 
-    stmt = (
-        select(Product)
-        .order_by(Product.id.asc())
-        .offset(offset)
-        .limit(page_size)
-    )
+    stmt = select(Product)
+    if filters:
+        stmt = stmt.where(*filters)
+    stmt = stmt.order_by(sort_column.asc() if sort_dir == "asc" else sort_column.desc())
+    stmt = stmt.offset(offset).limit(page_size)
     items = session.scalars(stmt).all()
 
     total_pages = math.ceil(total_items / page_size) if total_items else 0
@@ -76,6 +96,9 @@ def list_products():  # type: ignore[override]
                 "total_pages": total_pages,
                 "has_next": page * page_size < total_items,
                 "has_prev": page > 1,
+                "sort_by": sort_by,
+                "sort_dir": sort_dir,
+                "category": category_filter,
             },
         }
     )
