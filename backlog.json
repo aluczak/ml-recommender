@@ -1,0 +1,714 @@
+{
+  "items": [
+    {
+      "type": "milestone",
+      "title": "Milestone M1: Deployable Basic Web Application",
+      "description": "A fully working, containerized and Azure-deployable online shop SPA with product catalog, product details, cart, authentication, interaction tracking, and placeholder recommendations.",
+      "sub-issues": [
+        {
+          "type": "epic",
+          "title": "Core Project & Environment Setup",
+          "description": "Core Project & Environment Setup",
+          "sub-issues": [
+            {
+              "type": "feature",
+              "title": "Repository and base structure setup",
+              "description": "Repository and base structure setup",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Initialize repository and base folders",
+                  "description": "As a developer, I want a clean repository structure for backend, frontend, and infra, so that the project is easy to navigate and extend.\n\nAcceptance criteria:\n- Root repo contains at least backend, frontend, and scripts/infra folders\n- A .gitignore is present with Python, Node, and IDE ignores\n- Initial README exists describing the high-level project goals",
+                  "sub-issues": []
+                },
+                {
+                  "type": "user story",
+                  "title": "Define basic coding standards and tools",
+                  "description": "As a developer, I want basic formatting and linting tools configured, so that code quality is consistent across the project.\n\nAcceptance criteria:\n- Backend has a formatter/linter configured (e.g., black/flake8 or similar)\n- Frontend has a formatter/linter configured (e.g., prettier/eslint or similar)\n- Instructions for running these tools are documented in the README",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Backend skeleton with configuration loading",
+              "description": "Backend skeleton with configuration loading",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Create Flask application factory and config handling",
+                  "description": "As a developer, I want a minimal Flask app that loads config from environment, so that I can add endpoints without worrying about setup each time.\n\nAcceptance criteria:\n- Backend has an application factory that creates the Flask app\n- Configuration is loaded from environment variables and/or a config file\n- App can start locally and respond with a simple health check endpoint",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Frontend React SPA bootstrap",
+              "description": "Frontend React SPA bootstrap",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Initialize React SPA with routing",
+                  "description": "As a user, I want to load the shop UI from a single-page application, so that navigation feels fast and modern.\n\nAcceptance criteria:\n- React app builds and runs locally\n- Client-side routing is configured for at least home and catalog routes\n- A basic layout (header/content/footer) is visible",
+                  "sub-issues": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "epic",
+          "title": "Database Schema & Seeded Catalog",
+          "description": "Database Schema & Seeded Catalog",
+          "sub-issues": [
+            {
+              "type": "feature",
+              "title": "Core shop data model",
+              "description": "Core shop data model",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Design relational schema for users, products, carts, and interactions",
+                  "description": "As a developer, I want a normalized schema for main shop entities, so that data is consistent and easy to query for features and ML.\n\nAcceptance criteria:\n- Tables exist for users, products, carts, cart_items, orders (basic) and interactions\n- Each table has primary keys and required foreign keys\n- Schema is captured in migrations rather than only in ad-hoc SQL",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Migrations and DB connectivity",
+              "description": "Migrations and DB connectivity",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Set up Alembic migrations and database connection",
+                  "description": "As a developer, I want to manage schema changes via migrations, so that database state can be reproduced and evolved safely.\n\nAcceptance criteria:\n- Alembic (or equivalent) is configured in the backend\n- `upgrade` and `downgrade` commands work against a local PostgreSQL instance\n- Connection settings are read from environment variables",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Sample product catalog seeding",
+              "description": "Sample product catalog seeding",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Seed database with sample products",
+                  "description": "As a learner, I want a realistic product catalog available out-of-the-box, so that I can experiment with browsing and recommendations.\n\nAcceptance criteria:\n- A seed script exists that populates the products table with sample data\n- Sample data covers multiple categories and price ranges\n- Running the seed script can be done with a simple documented command",
+                  "sub-issues": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "epic",
+          "title": "Product Catalog & Details API",
+          "description": "Product Catalog & Details API",
+          "sub-issues": [
+            {
+              "type": "feature",
+              "title": "Product listing API",
+              "description": "Product listing API",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Expose paginated product list endpoint",
+                  "description": "As a shopper, I want to see a list of products with pagination, so that I can browse the catalog efficiently.\n\nAcceptance criteria:\n- GET /api/products returns a paginated list of products\n- Page size can be controlled via query parameters\n- Basic metadata (id, name, price, category, image URL) is returned",
+                  "sub-issues": []
+                },
+                {
+                  "type": "user story",
+                  "title": "Support basic sorting and filtering on product list",
+                  "description": "As a shopper, I want to sort and filter the catalog by basic attributes, so that I can focus on relevant products.\n\nAcceptance criteria:\n- Endpoint supports sorting by price and name\n- Endpoint supports filtering by category\n- Invalid parameters are validated and return helpful errors",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Product details API",
+              "description": "Product details API",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Expose endpoint for product details",
+                  "description": "As a shopper, I want to see full details for a selected product, so that I can decide whether it meets my needs.\n\nAcceptance criteria:\n- GET /api/products/{id} returns full product information\n- Non-existing product ids return a 404 with an error message\n- Response includes description, category, price, image URL and any available metadata",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Rule-based related products",
+              "description": "Rule-based related products",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Return simple related products from API",
+                  "description": "As a shopper, I want to see a few related products on the product page, so that I can discover alternatives or complements.\n\nAcceptance criteria:\n- An endpoint or field returns a small list of related items for a given product\n- Related logic is rule-based (e.g., same category or price range)\n- Implementation does not depend on ML yet",
+                  "sub-issues": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "epic",
+          "title": "Product Browsing & Details UI",
+          "description": "Product Browsing & Details UI",
+          "sub-issues": [
+            {
+              "type": "feature",
+              "title": "Catalog browsing page",
+              "description": "Catalog browsing page",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Implement product catalog grid in SPA",
+                  "description": "As a shopper, I want to browse products on a catalog page, so that I can quickly scan available items.\n\nAcceptance criteria:\n- Catalog route shows a grid/list of products from the API\n- Each card shows name, price, and image where available\n- Basic loading and error states are visible while fetching data",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Product detail page UI",
+              "description": "Product detail page UI",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Implement product detail view",
+                  "description": "As a shopper, I want to see key details for a selected product, so that I can decide whether to add it to my cart.\n\nAcceptance criteria:\n- Detail route fetches product info by id from the backend\n- Page shows main details and an add-to-cart action\n- Page shows a placeholder area for recommendations/related products",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Search and filter UI",
+              "description": "Search and filter UI",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Add search input and filters to catalog page",
+                  "description": "As a shopper, I want to search and filter products in the UI, so that I can narrow down to products that match my needs.\n\nAcceptance criteria:\n- Search box sends query to the backend list endpoint\n- Category filter and sort controls update the result list\n- Current search and filter state is reflected in the UI",
+                  "sub-issues": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "epic",
+          "title": "User Authentication",
+          "description": "User Authentication",
+          "sub-issues": [
+            {
+              "type": "feature",
+              "title": "User registration backend",
+              "description": "User registration backend",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Implement signup endpoint with validation",
+                  "description": "As a visitor, I want to create an account with email and password, so that I can have a persistent cart and personalized experience.\n\nAcceptance criteria:\n- POST /api/auth/register creates a new user with hashed password\n- Duplicate emails are rejected with a clear error\n- Invalid input (e.g., weak password) returns validation errors",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "User login and session",
+              "description": "User login and session",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Implement login endpoint and token/session handling",
+                  "description": "As a registered user, I want to log in securely, so that my future actions are associated with my account.\n\nAcceptance criteria:\n- POST /api/auth/login verifies credentials and returns a session or JWT\n- Invalid credentials return a 401 with a generic error message\n- Protected API endpoints require a valid token/session",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Authentication UI",
+              "description": "Authentication UI",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Add login and signup forms to SPA",
+                  "description": "As a visitor, I want to sign up and log in from the web UI, so that I can use authenticated features like a persistent cart.\n\nAcceptance criteria:\n- SPA has dedicated routes for login and signup\n- Forms validate required fields and show inline errors\n- Successful login updates the app state and navigation (e.g., shows user menu)",
+                  "sub-issues": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "epic",
+          "title": "Shopping Cart Functionality",
+          "description": "Shopping Cart Functionality",
+          "sub-issues": [
+            {
+              "type": "feature",
+              "title": "Cart API operations",
+              "description": "Cart API operations",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Implement cart CRUD endpoints",
+                  "description": "As a authenticated user, I want to manage items in my cart, so that I can prepare a set of products I intend to buy.\n\nAcceptance criteria:\n- Endpoints exist to get cart, add item, update quantity, and remove item\n- Cart is persisted per user in the database\n- Cart totals can be computed on the backend",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Cart UI and mock checkout",
+              "description": "Cart UI and mock checkout",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Allow users to view and edit cart in SPA",
+                  "description": "As a authenticated user, I want to see and update my cart items, so that I can adjust what I plan to purchase.\n\nAcceptance criteria:\n- Cart page shows current items, quantities, and subtotal\n- User can change quantities and remove items from the cart\n- Changes are persisted via the backend cart API",
+                  "sub-issues": []
+                },
+                {
+                  "type": "user story",
+                  "title": "Provide a mock checkout confirmation flow",
+                  "description": "As a learner, I want to complete a checkout-like flow without real payments, so that I can simulate a full shopping journey.\n\nAcceptance criteria:\n- User can click a checkout button from the cart page\n- App displays a confirmation screen summarizing the order\n- No real payment or external integration is performed",
+                  "sub-issues": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "epic",
+          "title": "Interaction Tracking for Recommendations",
+          "description": "Interaction Tracking for Recommendations",
+          "sub-issues": [
+            {
+              "type": "feature",
+              "title": "Interaction data model",
+              "description": "Interaction data model",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Add table(s) for user-product interactions",
+                  "description": "As a ML engineer, I want a structured log of user interactions with products, so that I can later train a recommendation model.\n\nAcceptance criteria:\n- Interaction table stores user id, product id, interaction type, and timestamp\n- Interaction types include at least view, click, add_to_cart, and pseudo_purchase\n- Schema is managed via migrations",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Backend logging of interactions",
+              "description": "Backend logging of interactions",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Record interactions via backend endpoints or hooks",
+                  "description": "As a developer, I want simple endpoints or hooks to log key user actions, so that interaction data accumulates without impacting UX.\n\nAcceptance criteria:\n- Backend exposes a small API or internal hooks to log interactions\n- Logging is called when key events occur (e.g., product viewed, cart updated)\n- Excessive logging is avoided to keep requests lightweight",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Frontend interaction instrumentation",
+              "description": "Frontend interaction instrumentation",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Send interaction events from SPA",
+                  "description": "As a developer, I want the frontend to emit interaction events to the backend, so that user behavior is captured for ML.\n\nAcceptance criteria:\n- Page views and key clicks trigger calls to the interaction logging API\n- Events are sent in the background where possible to minimize UI lag\n- Event sending errors are handled gracefully in the UI (no crashes)",
+                  "sub-issues": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "epic",
+          "title": "Placeholder Recommendations",
+          "description": "Placeholder Recommendations",
+          "sub-issues": [
+            {
+              "type": "feature",
+              "title": "Backend placeholder recommendation logic",
+              "description": "Backend placeholder recommendation logic",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Expose an endpoint for basic recommendations",
+                  "description": "As a shopper, I want to see simple recommendations before ML is ready, so that the UI can already demonstrate the recommendations concept.\n\nAcceptance criteria:\n- GET /api/recommendations returns a list of products\n- Logic is simple (e.g., top sellers, random, or rule-based)\n- Implementation is clearly separated so it can be swapped by ML later",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Recommendations UI components",
+              "description": "Recommendations UI components",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Display recommendations on home and product pages",
+                  "description": "As a shopper, I want to see recommended products in relevant places, so that I can discover more items I might like.\n\nAcceptance criteria:\n- Home page shows a recommendations section using data from the API\n- Product detail page shows a recommendations or related products section\n- Components are reusable so ML-based data can be plugged in later",
+                  "sub-issues": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "epic",
+          "title": "UI/UX Polish & Error Handling",
+          "description": "UI/UX Polish & Error Handling",
+          "sub-issues": [
+            {
+              "type": "feature",
+              "title": "Styling and layout polish",
+              "description": "Styling and layout polish",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Apply a consistent visual style to the SPA",
+                  "description": "As a shopper, I want the shop to look cohesive and pleasant, so that browsing feels like a real application and not a prototype.\n\nAcceptance criteria:\n- A base color palette and typography are defined and applied\n- Header, footer, and main content follow a consistent layout\n- Desktop layout is usable without major visual glitches",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Error and loading states",
+              "description": "Error and loading states",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Show clear loading and error messages for core flows",
+                  "description": "As a shopper, I want to understand when data is loading or if something went wrong, so that I am not confused by blank screens or failures.\n\nAcceptance criteria:\n- Catalog, detail, auth, and cart views show a spinner or skeleton while loading\n- Network or server errors show friendly error messages\n- 404 route shows a not-found page for unknown URLs",
+                  "sub-issues": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "epic",
+          "title": "Containerization & Local Orchestration",
+          "description": "Containerization & Local Orchestration",
+          "sub-issues": [
+            {
+              "type": "feature",
+              "title": "Backend and frontend Docker images",
+              "description": "Backend and frontend Docker images",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Create Dockerfile for backend service",
+                  "description": "As a developer, I want to run the backend in a container, so that local and cloud environments are consistent.\n\nAcceptance criteria:\n- Backend Dockerfile builds a working image that can serve the API\n- Image uses environment variables for configuration\n- Build steps are documented in README",
+                  "sub-issues": []
+                },
+                {
+                  "type": "user story",
+                  "title": "Create Dockerfile or containerized build for frontend",
+                  "description": "As a developer, I want to build and serve the SPA via a container, so that deployment can be container-based if desired.\n\nAcceptance criteria:\n- Frontend Dockerfile builds a production-ready SPA\n- Static assets can be served via a minimal web server or the backend\n- Build and run commands are documented",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Local Docker Compose setup",
+              "description": "Local Docker Compose setup",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Define docker-compose for backend, frontend, and DB",
+                  "description": "As a developer, I want to spin up the full stack with a single command, so that local development and demos are easy.\n\nAcceptance criteria:\n- docker-compose.yml (or Podman equivalent) defines backend, frontend, and PostgreSQL services\n- One command starts the stack and makes the app accessible in a browser\n- Environment variables are managed via an .env file",
+                  "sub-issues": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "epic",
+          "title": "Azure Deployment & Basic CI/CD",
+          "description": "Azure Deployment & Basic CI/CD",
+          "sub-issues": [
+            {
+              "type": "feature",
+              "title": "Azure resource definitions",
+              "description": "Azure resource definitions",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Define minimal Azure resources for app and DB",
+                  "description": "As a developer, I want a single Azure environment for the shop, so that I can deploy and access the app in the cloud.\n\nAcceptance criteria:\n- Resources include Azure App Service (or containers) for backend\n- Resources include hosting for frontend and Azure PostgreSQL flexible server\n- Resource definitions are captured in Terraform or scripts (even if simple)",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Basic GitHub Actions pipeline",
+              "description": "Basic GitHub Actions pipeline",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Automate build and deployment to Azure",
+                  "description": "As a developer, I want a simple CI/CD workflow for this project, so that I can deploy changes with minimal manual steps.\n\nAcceptance criteria:\n- GitHub Actions workflow builds backend and frontend\n- Workflow deploys to the defined Azure resources on push to main (or on demand)\n- Secrets and connection strings are stored securely via GitHub/Azure config",
+                  "sub-issues": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "epic",
+          "title": "Basic Testing & Documentation",
+          "description": "Basic Testing & Documentation",
+          "sub-issues": [
+            {
+              "type": "feature",
+              "title": "Core backend API tests",
+              "description": "Core backend API tests",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Add tests for catalog, auth, and cart endpoints",
+                  "description": "As a developer, I want smoke tests for key backend endpoints, so that I can catch obvious regressions quickly.\n\nAcceptance criteria:\n- Tests cover happy-path flows for product listing, login, and cart operations\n- Tests can be run with a single documented command\n- Tests run in CI and must pass for a successful pipeline run",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Frontend smoke tests and documentation",
+              "description": "Frontend smoke tests and documentation",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Add a few key frontend tests and update README",
+                  "description": "As a developer, I want basic confidence that main UI flows work, so that changes don't silently break the app.\n\nAcceptance criteria:\n- At least a few tests exist for core components or flows (e.g., catalog, cart)\n- README explains how to run frontend and backend tests\n- README describes overall architecture and main components at a high level",
+                  "sub-issues": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "milestone",
+      "title": "Milestone M2: Machine Learning Recommendations",
+      "description": "Replace placeholder recommendations with ML-based ones, using collected interaction data, and integrate ML into the existing deployed app.",
+      "sub-issues": [
+        {
+          "type": "epic",
+          "title": "Data Extraction & Preparation",
+          "description": "Data Extraction & Preparation",
+          "sub-issues": [
+            {
+              "type": "feature",
+              "title": "Interaction and product data extraction",
+              "description": "Interaction and product data extraction",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Build data extraction process from PostgreSQL",
+                  "description": "As a ML engineer, I want to extract interactions and product data into analysis-friendly formats, so that I can run experiments and training easily.\n\nAcceptance criteria:\n- Script or notebook pulls interactions and product metadata into Pandas DataFrames\n- Queries are efficient enough for the expected data size\n- Extraction can be re-run without manual DB tweaking",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Preprocessing and dataset creation",
+              "description": "Preprocessing and dataset creation",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Create training, validation, and test datasets",
+                  "description": "As a ML engineer, I want clean datasets split for training and evaluation, so that model performance can be measured reliably.\n\nAcceptance criteria:\n- Preprocessing pipeline handles missing data and basic cleaning\n- Train/validation/test splits are clearly defined and reproducible\n- Resulting datasets are stored in a known location for training scripts",
+                  "sub-issues": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "epic",
+          "title": "Baseline ML Recommendation Model",
+          "description": "Baseline ML Recommendation Model",
+          "sub-issues": [
+            {
+              "type": "feature",
+              "title": "Baseline algorithm implementation",
+              "description": "Baseline algorithm implementation",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Implement first recommender (e.g., popularity or simple CF)",
+                  "description": "As a ML learner, I want a simple baseline recommendation model, so that I can compare more advanced approaches later.\n\nAcceptance criteria:\n- Training code computes a basic model using interactions data\n- Model produces top-N recommendations per user or per item\n- Training code runs end-to-end with documented commands",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Baseline evaluation and metrics",
+              "description": "Baseline evaluation and metrics",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Evaluate baseline model with simple metrics",
+                  "description": "As a ML learner, I want to understand the performance of the baseline model, so that I have a reference point for future models.\n\nAcceptance criteria:\n- Metrics such as precision@k or recall@k are computed on the test set\n- Evaluation results are logged or printed in a readable format\n- Short notes explain how to interpret the chosen metrics",
+                  "sub-issues": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "epic",
+          "title": "Enhanced/Iterative Recommendation Models",
+          "description": "Enhanced/Iterative Recommendation Models",
+          "sub-issues": [
+            {
+              "type": "feature",
+              "title": "Alternative recommendation strategy",
+              "description": "Alternative recommendation strategy",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Implement an alternative model (e.g., content-based)",
+                  "description": "As a ML learner, I want to try a second, different recommendation approach, so that I can compare and contrast modeling strategies.\n\nAcceptance criteria:\n- Alternative model uses product features (e.g., categories, tags) or different CF logic\n- Training and prediction functions are implemented and runnable\n- Model can be evaluated with the same metrics as the baseline",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Model comparison and selection",
+              "description": "Model comparison and selection",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Compare models and select primary",
+                  "description": "As a ML learner, I want to choose a primary model for serving, so that the web app uses a reasonably good recommender.\n\nAcceptance criteria:\n- Baseline and alternative models are compared on the same test set\n- A simple report or notes summarize pros/cons and metrics\n- One model is chosen as the primary for production integration",
+                  "sub-issues": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "epic",
+          "title": "Model Serving Integration",
+          "description": "Model Serving Integration",
+          "sub-issues": [
+            {
+              "type": "feature",
+              "title": "Model loading and inference service",
+              "description": "Model loading and inference service",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Add backend service layer for recommendations",
+                  "description": "As a developer, I want a clean interface for loading the model and generating recommendations, so that the web API can serve ML-based recommendations.\n\nAcceptance criteria:\n- Backend service can load the serialized model from disk or storage\n- Service exposes a function to get recommendations for a user or context\n- Errors in model loading or inference are handled gracefully",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "API integration and fallback behavior",
+              "description": "API integration and fallback behavior",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Wire ML model into recommendations API with fallback",
+                  "description": "As a shopper, I want to receive ML-based recommendations in the app, so that suggestions feel more personalized than the placeholder logic.\n\nAcceptance criteria:\n- Recommendations endpoint now calls the ML service instead of placeholder logic\n- If model is unavailable or user data is sparse, a safe fallback is used\n- Configuration allows switching between baseline, enhanced model, or placeholder if needed",
+                  "sub-issues": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "epic",
+          "title": "Training & Update Workflow",
+          "description": "Training & Update Workflow",
+          "sub-issues": [
+            {
+              "type": "feature",
+              "title": "End-to-end training pipeline",
+              "description": "End-to-end training pipeline",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Create reproducible training pipeline script/notebook",
+                  "description": "As a ML engineer, I want a single entry point for retraining the model, so that I can update the model as new interactions arrive.\n\nAcceptance criteria:\n- Pipeline script runs extraction, preprocessing, training, and evaluation\n- Pipeline outputs trained model artifacts and evaluation report\n- Steps and parameters are documented in code or README",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Model storage and versioning",
+              "description": "Model storage and versioning",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Persist trained models with simple versioning",
+                  "description": "As a ML engineer, I want to store models in a central place with version info, so that I can roll forward or back between model versions.\n\nAcceptance criteria:\n- Trained models are saved with version identifiers (e.g., timestamps or semantic versions)\n- Models are stored on disk or in Azure Blob Storage with a clear path convention\n- Backend can be configured to use a specific model version",
+                  "sub-issues": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "epic",
+          "title": "ML Observability & Evaluation in Production",
+          "description": "ML Observability & Evaluation in Production",
+          "sub-issues": [
+            {
+              "type": "feature",
+              "title": "Online metrics collection",
+              "description": "Online metrics collection",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Capture basic online recommendation metrics",
+                  "description": "As a ML learner, I want to observe how recommendations are used in the live app, so that I can compare offline evaluation with real behavior.\n\nAcceptance criteria:\n- System tracks key metrics such as number of recommendation requests and clicks\n- Metrics are stored in a simple, queryable form (DB table, logs, or telemetry)\n- A simple script or notebook can summarize these metrics over time",
+                  "sub-issues": []
+                }
+              ]
+            },
+            {
+              "type": "feature",
+              "title": "Monitoring and guardrails",
+              "description": "Monitoring and guardrails",
+              "sub-issues": [
+                {
+                  "type": "user story",
+                  "title": "Add simple checks and documentation for ML behavior",
+                  "description": "As a developer, I want basic safeguards around recommendation quality and stability, so that I can notice if the model or data degrades.\n\nAcceptance criteria:\n- Documentation describes common failure modes and how to respond\n- Simple sanity checks (e.g., no empty recommendation lists) are in place\n- Guidance exists on when to retrain or roll back a model",
+                  "sub-issues": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

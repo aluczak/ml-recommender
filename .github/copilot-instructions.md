@@ -39,6 +39,7 @@ This is a training excercise project to build an online shop that uses machine l
 
 # Out of scope
 - Payment Gateway Integration: No real payment processing will be implemented.
+- Checkout Process: The application will not include a complete checkout workflow.
 - Advanced Security Measures: Basic security practices will be followed, but advanced measures like multi-factor authentication will not be implemented.
 - Scalability: The application will be designed for learning purposes and may not handle high traffic loads
 - Mobile Optimization: The application will be primarily designed for desktop use, with limited mobile responsiveness.
