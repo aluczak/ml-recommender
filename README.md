@@ -83,6 +83,10 @@ python scripts/seed_products.py --reset
 - `--reset` clears any existing products before inserting the curated dataset; omit the flag to upsert without deleting.
 - Seed data is defined in `app/data/sample_products.py` and covers multiple categories/price ranges for UI and ML experimentation.
 
+### REST API (dev snapshot)
+- `GET /api/health` – simple service heartbeat
+- `GET /api/products?page=<n>&page_size=<n>` – paginated catalog response with metadata (defaults: page 1, 12 items)
+
 ### Frontend (React SPA)
 ```
 cd frontend

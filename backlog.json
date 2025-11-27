@@ -63,7 +63,7 @@
               "status": "completed"
             }
           ],
-          "status": "not-started"
+          "status": "completed"
         },
         {
           "type": "epic",
@@ -98,7 +98,7 @@
                   "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             },
             {
               "type": "feature",
@@ -113,10 +113,10 @@
                   "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             }
           ],
-          "status": "not-started"
+          "status": "completed"
         },
         {
           "type": "epic",
@@ -133,7 +133,7 @@
                   "title": "Expose paginated product list endpoint",
                   "description": "As a shopper, I want to see a list of products with pagination, so that I can browse the catalog efficiently.\n\nAcceptance criteria:\n- GET /api/products returns a paginated list of products\n- Page size can be controlled via query parameters\n- Basic metadata (id, name, price, category, image URL) is returned",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 },
                 {
                   "type": "user story",
@@ -143,7 +143,7 @@
                   "status": "not-started"
                 }
               ],
-              "status": "not-started"
+              "status": "in-progress"
             },
             {
               "type": "feature",
@@ -176,7 +176,7 @@
               "status": "not-started"
             }
           ],
-          "status": "not-started"
+          "status": "in-progress"
         },
         {
           "type": "epic",
@@ -580,7 +580,7 @@
           "status": "not-started"
         }
       ],
-      "status": "not-started"
+      "status": "in-progress"
     },
     {
       "type": "milestone",

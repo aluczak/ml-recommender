@@ -7,6 +7,7 @@ from flask import Flask
 from .config import AppConfig, load_config
 from .db import init_db
 from .routes.health import health_bp
+from .routes.products import products_bp
 
 
 def create_app(config_override: AppConfig | None = None) -> Flask:
@@ -24,6 +25,7 @@ def create_app(config_override: AppConfig | None = None) -> Flask:
     init_db(app, config)
 
     app.register_blueprint(health_bp, url_prefix="/api")
+    app.register_blueprint(products_bp, url_prefix="/api")
 
     @app.get("/")
     def root() -> tuple[str, int]:
