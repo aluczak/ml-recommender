@@ -80,10 +80,10 @@
                   "title": "Design relational schema for users, products, carts, and interactions",
                   "description": "As a developer, I want a normalized schema for main shop entities, so that data is consistent and easy to query for features and ML.\n\nAcceptance criteria:\n- Tables exist for users, products, carts, cart_items, orders (basic) and interactions\n- Each table has primary keys and required foreign keys\n- Schema is captured in migrations rather than only in ad-hoc SQL",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             },
             {
               "type": "feature",

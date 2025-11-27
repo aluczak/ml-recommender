@@ -27,8 +27,9 @@ backlog.json# Structured backlog that mirrors milestones/epics/user stories
 ## Getting Started
 1. Install Python 3.11+, Node.js 20+, Docker Desktop (for containers), and Azure CLI (for later deployment).
 2. Create a virtual environment inside `.venv` or similar and install backend requirements via `pip install -r requirements.txt -r requirements-dev.txt` (see Backend section below).
-3. Inside `frontend/`, install Node dependencies (`npm install`) and run the SPA locally via `npm run dev`.
-4. Use `backlog.json` as the single source of truth for upcoming features and track progress via GitHub issues/projects.
+3. Apply the initial Alembic migration (`alembic upgrade head`) so the database schema exists locally.
+4. Inside `frontend/`, install Node dependencies (`npm install`) and run the SPA locally via `npm run dev`.
+5. Use `backlog.json` as the single source of truth for upcoming features and track progress via GitHub issues/projects.
 
 ## Code Quality & Tooling
 ### Backend (Flask)
@@ -62,6 +63,15 @@ flask --app app:create_app --debug run
 python run.py
 ```
 The Flask app loads configuration from environment variables (optionally via `.env`). Customize `APP_ENV`, `FLASK_DEBUG`, `SECRET_KEY`, or `DATABASE_URL` as needed.
+
+### Database & migrations
+```
+cd backend
+alembic upgrade head                      # Apply latest schema
+alembic revision -m "describe change" --autogenerate  # Generate new migration
+```
+- Default dev database is SQLite at `backend/instance/app.db`; override `DATABASE_URL` for PostgreSQL (e.g., `postgresql+psycopg://user:pass@localhost:5432/mlshop`).
+- Delete `instance/app.db` and rerun `alembic upgrade head` if you want a clean slate locally.
 
 ### Frontend (React SPA)
 ```

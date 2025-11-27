@@ -5,6 +5,7 @@ from __future__ import annotations
 from flask import Flask
 
 from .config import AppConfig, load_config
+from .db import init_db
 from .routes.health import health_bp
 
 
@@ -20,6 +21,7 @@ def create_app(config_override: AppConfig | None = None) -> Flask:
         DATABASE_URL=config.database_url,
     )
     app.config["APP_CONFIG"] = config
+    init_db(app, config)
 
     app.register_blueprint(health_bp, url_prefix="/api")
 

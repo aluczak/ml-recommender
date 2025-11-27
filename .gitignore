@@ -42,5 +42,6 @@ Thumbs.db
 # Containers / Misc
 *.log
 *.sqlite3
+backend/instance/*.db
 **/.terraform/
 terraform.tfstate*
