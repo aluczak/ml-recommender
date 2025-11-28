@@ -7,8 +7,7 @@ from flask_cors import CORS
 
 from .config import AppConfig, load_config
 from .db import init_db
-from .routes.health import health_bp
-from .routes.products import products_bp
+from .routes import auth_bp, health_bp, products_bp
 
 
 def create_app(config_override: AppConfig | None = None) -> Flask:
@@ -28,6 +27,7 @@ def create_app(config_override: AppConfig | None = None) -> Flask:
 
     app.register_blueprint(health_bp, url_prefix="/api")
     app.register_blueprint(products_bp, url_prefix="/api")
+    app.register_blueprint(auth_bp, url_prefix="/api")
 
     @app.get("/")
     def root() -> tuple[str, int]:

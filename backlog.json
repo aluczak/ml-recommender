@@ -246,10 +246,10 @@
                   "title": "Implement signup endpoint with validation",
                   "description": "As a visitor, I want to create an account with email and password, so that I can have a persistent cart and personalized experience.\n\nAcceptance criteria:\n- POST /api/auth/register creates a new user with hashed password\n- Duplicate emails are rejected with a clear error\n- Invalid input (e.g., weak password) returns validation errors",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             },
             {
               "type": "feature",
@@ -261,10 +261,10 @@
                   "title": "Implement login endpoint and token/session handling",
                   "description": "As a registered user, I want to log in securely, so that my future actions are associated with my account.\n\nAcceptance criteria:\n- POST /api/auth/login verifies credentials and returns a session or JWT\n- Invalid credentials return a 401 with a generic error message\n- Protected API endpoints require a valid token/session",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             },
             {
               "type": "feature",
@@ -276,13 +276,13 @@
                   "title": "Add login and signup forms to SPA",
                   "description": "As a visitor, I want to sign up and log in from the web UI, so that I can use authenticated features like a persistent cart.\n\nAcceptance criteria:\n- SPA has dedicated routes for login and signup\n- Forms validate required fields and show inline errors\n- Successful login updates the app state and navigation (e.g., shows user menu)",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             }
           ],
-          "status": "not-started"
+          "status": "completed"
         },
         {
           "type": "epic",

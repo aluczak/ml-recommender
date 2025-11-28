@@ -66,6 +66,7 @@ python run.py
 The Flask app loads configuration from environment variables (optionally via `.env`). Customize `APP_ENV`, `FLASK_DEBUG`, `SECRET_KEY`, or `DATABASE_URL` as needed. A lightweight compatibility shim (`app/typing_compat.py`) patches SQLAlchemy's typing helpers so Alembic continues to run even on Python 3.13/3.14.
 
 - Cross-origin requests: `flask-cors` is enabled for `/api/*` endpoints by default so the Vite dev server (`http://localhost:5173`) can talk to `http://localhost:5000`. Adjust CORS settings in `app/__init__.py` if you need stricter origins.
+- Access tokens: `ACCESS_TOKEN_EXP_MINUTES` controls how long issued login tokens remain valid (default 60 minutes). Tokens are lightweight signed strings (itsdangerous) so no additional infrastructure is required.
 
 ### Database & migrations
 ```
@@ -87,6 +88,9 @@ python scripts/seed_products.py --reset
 
 ### REST API (dev snapshot)
 - `GET /api/health` – simple service heartbeat
+- `POST /api/auth/register` – create an account with `{email, password, full_name?}`; returns the created user plus an access token. Duplicate emails are rejected with `409`.
+- `POST /api/auth/login` – exchange `{email, password}` for an access token (Bearer) and user payload. Invalid credentials respond with `401`.
+- `GET /api/auth/me` – requires an `Authorization: Bearer <token>` header and returns the profile for the authenticated user; `401` when the token is missing/invalid/expired.
 - `GET /api/products?page=<n>&page_size=<n>&category=<name>&sort_by=name|price&sort_dir=asc|desc&q=<keywords>` – paginated catalog response with optional search, category filter, and sorting (defaults: page 1, 12 items, sort by name asc). Responses also include `filters.available_categories` so the SPA can render the current taxonomy without hardcoding it.
 - `GET /api/products/{id}` – full details for a single product, returns 404 + error JSON when not found
 - `GET /api/products/{id}/related?limit=<n>` – rule-based related items (same category when possible, otherwise price-proximate fallbacks)
@@ -112,6 +116,7 @@ npm run format
 The SPA uses Vite + React Router with a flat-configured ESLint (`eslint.config.js`) and Prettier (`.prettierrc.json`) for consistent code style.
 
 - Frontend reads `VITE_API_BASE_URL` (see `frontend/.env.example`) to decide which backend `/api` host to call. Defaults to `http://localhost:5000/api` for local dev.
+- Login/signup routes (`/login`, `/signup`) talk to the new auth endpoints, persist the returned token in `localStorage`, and expose auth state throughout the SPA via a lightweight context (`AuthProvider`). Header navigation updates automatically when users log in/out.
 - The catalog route (`/catalog`) now includes a search box, category dropdown, and sort controls; every change re-queries the backend list endpoint so results stay in sync with API capabilities.
 
 ## Next Steps

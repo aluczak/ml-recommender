@@ -30,6 +30,7 @@ class AppConfig:
     debug: bool = _str_to_bool(os.getenv("FLASK_DEBUG"), False)
     secret_key: str = os.getenv("SECRET_KEY", "changeme")
     database_url: str = os.getenv("DATABASE_URL", "sqlite:///instance/app.db")
+    access_token_exp_minutes: int = int(os.getenv("ACCESS_TOKEN_EXP_MINUTES", "60"))
 
 
 def load_config() -> AppConfig:
