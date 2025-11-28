@@ -344,10 +344,10 @@
                   "title": "Add table(s) for user-product interactions",
                   "description": "As a ML engineer, I want a structured log of user interactions with products, so that I can later train a recommendation model.\n\nAcceptance criteria:\n- Interaction table stores user id, product id, interaction type, and timestamp\n- Interaction types include at least view, click, add_to_cart, and pseudo_purchase\n- Schema is managed via migrations",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             },
             {
               "type": "feature",
@@ -359,10 +359,10 @@
                   "title": "Record interactions via backend endpoints or hooks",
                   "description": "As a developer, I want simple endpoints or hooks to log key user actions, so that interaction data accumulates without impacting UX.\n\nAcceptance criteria:\n- Backend exposes a small API or internal hooks to log interactions\n- Logging is called when key events occur (e.g., product viewed, cart updated)\n- Excessive logging is avoided to keep requests lightweight",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             },
             {
               "type": "feature",
@@ -374,13 +374,13 @@
                   "title": "Send interaction events from SPA",
                   "description": "As a developer, I want the frontend to emit interaction events to the backend, so that user behavior is captured for ML.\n\nAcceptance criteria:\n- Page views and key clicks trigger calls to the interaction logging API\n- Events are sent in the background where possible to minimize UI lag\n- Event sending errors are handled gracefully in the UI (no crashes)",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             }
           ],
-          "status": "not-started"
+          "status": "completed"
         },
         {
           "type": "epic",

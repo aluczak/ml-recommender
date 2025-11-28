@@ -57,6 +57,32 @@ def resolve_authenticated_user() -> tuple[User | None, str | None, int]:
     return user, None, 200
 
 
+def resolve_user_if_present() -> tuple[User | None, str | None]:
+    """Resolve the current user only when a bearer token is provided."""
+
+    token = extract_bearer_token()
+    if not token:
+        return None, None
+
+    config = get_app_config()
+    try:
+        token_data = decode_access_token(
+            token,
+            current_app.config["SECRET_KEY"],
+            config.access_token_exp_minutes * 60,
+        )
+    except TokenError as exc:
+        return None, str(exc)
+
+    session = get_session()
+    user = session.get(User, token_data.user_id)
+    if user is None:
+        return None, "User referenced by token no longer exists"
+
+    g.current_user = user
+    return user, None
+
+
 def issue_access_token(user: User) -> tuple[str, int]:
     """Generate an access token and return it with expiry metadata."""
 
@@ -70,5 +96,6 @@ __all__ = [
     "get_app_config",
     "extract_bearer_token",
     "resolve_authenticated_user",
+    "resolve_user_if_present",
     "issue_access_token",
 ]

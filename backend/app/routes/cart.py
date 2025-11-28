@@ -4,13 +4,14 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, current_app, jsonify, request
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from ..auth_helpers import resolve_authenticated_user
 from ..db import get_session
 from ..models import Cart, CartItem, Order, Product, User
+from ..services import InteractionLoggingError, log_interaction
 
 cart_bp = Blueprint("cart", __name__)
 
@@ -104,6 +105,27 @@ def _cart_response(cart: Cart):
     return jsonify({"cart": _serialize_cart(cart)})
 
 
+def _record_interaction(
+    *,
+    session,
+    product_id: int,
+    interaction_type: str,
+    user: User,
+    metadata: dict[str, object] | None = None,
+) -> None:
+    try:
+        log_interaction(
+            product_id=product_id,
+            interaction_type=interaction_type,
+            user=user,
+            metadata=metadata,
+            session=session,
+            commit=False,
+        )
+    except InteractionLoggingError as exc:  # pragma: no cover - logging path
+        current_app.logger.debug("Interaction log skipped: %s", exc)
+
+
 def _find_cart_item_for_user(item_id: int, user: User) -> CartItem | None:
     session = get_session()
     stmt = (
@@ -176,6 +198,18 @@ def add_cart_item():  # type: ignore[override]
         item.quantity = new_quantity
         item.unit_price = product.price
 
+    _record_interaction(
+        session=session,
+        product_id=product.id,
+        interaction_type="add_to_cart",
+        user=user,
+        metadata={
+            "quantity": item.quantity,
+            "delta": quantity_value,
+            "source": "api",
+        },
+    )
+
     session.commit()
     refreshed = _load_cart_with_items(cart.id)
     return _cart_response(refreshed or cart)
@@ -206,6 +240,13 @@ def update_cart_item(item_id: int):  # type: ignore[override]
         session.delete(item)
     else:
         item.quantity = quantity_value
+    _record_interaction(
+        session=session,
+        product_id=item.product_id,
+        interaction_type="update_cart",
+        user=user,
+        metadata={"quantity": quantity_value},
+    )
     session.commit()
 
     refreshed = _load_cart_with_items(item.cart_id)
@@ -224,7 +265,15 @@ def delete_cart_item(item_id: int):  # type: ignore[override]
 
     session = get_session()
     cart_id = item.cart_id
+    product_id = item.product_id
     session.delete(item)
+    _record_interaction(
+        session=session,
+        product_id=product_id,
+        interaction_type="update_cart",
+        user=user,
+        metadata={"quantity": 0},
+    )
     session.commit()
 
     refreshed = _load_cart_with_items(cart_id)
@@ -263,6 +312,18 @@ def checkout_cart():  # type: ignore[override]
 
     new_cart = Cart(user_id=user.id, status="open")
     session.add(new_cart)
+    for item in cart.items:
+        line_total = Decimal(item.unit_price or 0) * item.quantity
+        _record_interaction(
+            session=session,
+            product_id=item.product_id,
+            interaction_type="pseudo_purchase",
+            user=user,
+            metadata={
+                "quantity": item.quantity,
+                "line_total": float(line_total),
+            },
+        )
     session.commit()
 
     response_payload = {

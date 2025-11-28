@@ -91,6 +91,7 @@ python scripts/seed_products.py --reset
 - `POST /api/auth/register` – create an account with `{email, password, full_name?}`; returns the created user plus an access token. Duplicate emails are rejected with `409`.
 - `POST /api/auth/login` – exchange `{email, password}` for an access token (Bearer) and user payload. Invalid credentials respond with `401`.
 - `GET /api/auth/me` – requires an `Authorization: Bearer <token>` header and returns the profile for the authenticated user; `401` when the token is missing/invalid/expired.
+- `POST /api/interactions` – logs `view`, `click`, `add_to_cart`, `update_cart`, or `pseudo_purchase` events for a specific product. Accepts optional Bearer token (anonymous interactions are supported via metadata-only logging).
 - `GET /api/cart` – returns the user's open cart (auto-creates an empty one). Requires Bearer token.
 - `POST /api/cart/items` – add or increment a product in the cart: `{product_id, quantity}`.
 - `PATCH /api/cart/items/{item_id}` – adjust quantity (set to `0` to remove); limited to the owner's open cart.
@@ -124,6 +125,7 @@ The SPA uses Vite + React Router with a flat-configured ESLint (`eslint.config.j
 - Login/signup routes (`/login`, `/signup`) talk to the new auth endpoints, persist the returned token in `localStorage`, and expose auth state throughout the SPA via a lightweight context (`AuthProvider`). Header navigation updates automatically when users log in/out.
 - `/cart` lets authenticated users review their server-side cart, tweak quantities, remove items, and run a mock checkout. The UI talks to dedicated cart endpoints via a `CartProvider` that keeps token handling consistent.
 - Product detail pages now include an "Add to cart" button that wires directly into the cart context; checkout success has a confirmation screen at `/cart/confirmation` summarizing the order reference returned by the API.
+- Catalog/product detail/related card interactions fire `click`/`view`/`add_to_cart` events via a lightweight logger that uses `navigator.sendBeacon` when possible; backend cart mutations also log `update_cart` and `pseudo_purchase` events so the ML pipeline has both anonymous and authenticated signals.
 - The catalog route (`/catalog`) now includes a search box, category dropdown, and sort controls; every change re-queries the backend list endpoint so results stay in sync with API capabilities.
 
 ## Next Steps

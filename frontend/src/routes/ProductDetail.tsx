@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { API_BASE_URL } from "../config";
 import { formatPrice } from "../utils/format";
 import type { Product } from "../types/product";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
+import { sendInteraction } from "../utils/interactions";
 
 const RELATED_LIMIT = 4;
 
@@ -21,7 +22,8 @@ const ProductDetail = () => {
   const [cartMessage, setCartMessage] = useState<string | null>(null);
   const [cartMessageType, setCartMessageType] = useState<"success" | "error" | null>(null);
   const { addItem, mutating } = useCart();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
+  const viewLoggedRef = useRef<number | null>(null);
 
   const productUrl = useMemo(() => {
     if (!productId) {
@@ -96,6 +98,20 @@ const ProductDetail = () => {
     return () => controller.abort();
   }, [hydratePage]);
 
+  useEffect(() => {
+    if (product && viewLoggedRef.current !== product.id) {
+      viewLoggedRef.current = product.id;
+      sendInteraction(
+        {
+          productId: product.id,
+          interactionType: "view",
+          metadata: { source: "product_detail" },
+        },
+        token
+      );
+    }
+  }, [product, token]);
+
   const isLoading = status === "loading" && !product;
 
   const handleAddToCart = async () => {
@@ -113,12 +129,31 @@ const ProductDetail = () => {
       await addItem(product.id, 1);
       setCartMessage(`${product.name} added to your cart.`);
       setCartMessageType("success");
+      sendInteraction(
+        {
+          productId: product.id,
+          interactionType: "add_to_cart",
+          metadata: { source: "product_detail" },
+        },
+        token
+      );
     } catch (err) {
       setCartMessage(
         err instanceof Error ? err.message : "Unable to add this item right now."
       );
       setCartMessageType("error");
     }
+  };
+
+  const logProductClick = (targetProductId: number, source: string) => {
+    sendInteraction(
+      {
+        productId: targetProductId,
+        interactionType: "click",
+        metadata: { source },
+      },
+      token
+    );
   };
 
   return (
@@ -171,7 +206,11 @@ const ProductDetail = () => {
               </Link>
             </div>
             {cartMessage && (
-              <p className={`status ${cartMessageType === "error" ? "status-error" : "status"}`}>
+              <p
+                className={`status ${
+                  cartMessageType === "error" ? "status-error" : "status-success"
+                }`}
+              >
                 {cartMessage}
               </p>
             )}
@@ -188,7 +227,12 @@ const ProductDetail = () => {
           <div className="grid related-grid">
             {related.map((item) => (
               <article className="card" key={item.id}>
-                <Link to={`/catalog/${item.id}`} className="card-link" aria-label={`View ${item.name}`}>
+                <Link
+                  to={`/catalog/${item.id}`}
+                  className="card-link"
+                  aria-label={`View ${item.name}`}
+                  onClick={() => logProductClick(item.id, "related_grid")}
+                >
                   <img
                     src={item.image_url || fallbackImage}
                     alt={item.name}

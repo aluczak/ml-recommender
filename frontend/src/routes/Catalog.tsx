@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { API_BASE_URL } from "../config";
 import { formatPrice } from "../utils/format";
 import type { Product } from "../types/product";
+import { sendInteraction } from "../utils/interactions";
+import { useAuth } from "../context/AuthContext";
 
 const PAGE_SIZE = 12;
 
@@ -48,6 +50,7 @@ const Catalog = () => {
   const [searchInput, setSearchInput] = useState(params.query);
   const [categories, setCategories] = useState<string[]>([]);
   const [pagination, setPagination] = useState<PaginationInfo | null>(null);
+  const { token } = useAuth();
 
   const fetchProducts = useCallback(async (currentParams: CatalogParams, signal?: AbortSignal) => {
     setLoading(true);
@@ -129,6 +132,17 @@ const Catalog = () => {
 
   const retryFetch = () => {
     setParams((prev) => ({ ...prev }));
+  };
+
+  const handleProductClick = (productId: number) => {
+    sendInteraction(
+      {
+        productId,
+        interactionType: "click",
+        metadata: { source: "catalog_grid" },
+      },
+      token
+    );
   };
 
   const totalItems = pagination?.total_items ?? products.length;
@@ -221,7 +235,12 @@ const Catalog = () => {
         <div className="grid">
           {products.map((product) => (
             <article className="card" key={product.id}>
-              <Link to={`/catalog/${product.id}`} className="card-link" aria-label={`View ${product.name}`}>
+                <Link
+                  to={`/catalog/${product.id}`}
+                  className="card-link"
+                  aria-label={`View ${product.name}`}
+                  onClick={() => handleProductClick(product.id)}
+                >
                 <img
                   src={product.image_url || "https://placehold.co/600x400?text=Product"}
                   alt={product.name}
