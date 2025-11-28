@@ -100,6 +100,7 @@ python scripts/seed_products.py --reset
 - `GET /api/products?page=<n>&page_size=<n>&category=<name>&sort_by=name|price&sort_dir=asc|desc&q=<keywords>` – paginated catalog response with optional search, category filter, and sorting (defaults: page 1, 12 items, sort by name asc). Responses also include `filters.available_categories` so the SPA can render the current taxonomy without hardcoding it.
 - `GET /api/products/{id}` – full details for a single product, returns 404 + error JSON when not found
 - `GET /api/products/{id}/related?limit=<n>` – rule-based related items (same category when possible, otherwise price-proximate fallbacks)
+- `GET /api/recommendations?context=home|product&product_id=<id>&limit=<n>` – placeholder recommendations ranked by recent interaction volume (general for home, category-focused for product detail). The logic lives in `app/services/recommendations.py` so it can be swapped with ML-driven scoring later.
 
 ### Frontend (React SPA)
 ```
@@ -126,6 +127,7 @@ The SPA uses Vite + React Router with a flat-configured ESLint (`eslint.config.j
 - `/cart` lets authenticated users review their server-side cart, tweak quantities, remove items, and run a mock checkout. The UI talks to dedicated cart endpoints via a `CartProvider` that keeps token handling consistent.
 - Product detail pages now include an "Add to cart" button that wires directly into the cart context; checkout success has a confirmation screen at `/cart/confirmation` summarizing the order reference returned by the API.
 - Catalog/product detail/related card interactions fire `click`/`view`/`add_to_cart` events via a lightweight logger that uses `navigator.sendBeacon` when possible; backend cart mutations also log `update_cart` and `pseudo_purchase` events so the ML pipeline has both anonymous and authenticated signals.
+- Home and product detail routes include a reusable `RecommendationsSection` component that calls `/api/recommendations`, shows rule-based placeholder suggestions, and emits interaction logs so the ML stack can later compare placeholder vs. learned behavior.
 - The catalog route (`/catalog`) now includes a search box, category dropdown, and sort controls; every change re-queries the backend list endpoint so results stay in sync with API capabilities.
 
 ## Next Steps

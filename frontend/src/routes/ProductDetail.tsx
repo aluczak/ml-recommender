@@ -6,6 +6,7 @@ import type { Product } from "../types/product";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { sendInteraction } from "../utils/interactions";
+import RecommendationsSection from "../components/RecommendationsSection";
 
 const RELATED_LIMIT = 4;
 
@@ -251,6 +252,17 @@ const ProductDetail = () => {
             ))}
           </div>
         </section>
+      )}
+
+      {product && (
+        <RecommendationsSection
+          title="Recommended for you"
+          description="Placeholder suggestions factoring in popularity and category trends."
+          context="product"
+          productId={product.id}
+          limit={4}
+          interactionSource="product_recommendations"
+        />
       )}
     </section>
   );

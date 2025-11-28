@@ -397,10 +397,10 @@
                   "title": "Expose an endpoint for basic recommendations",
                   "description": "As a shopper, I want to see simple recommendations before ML is ready, so that the UI can already demonstrate the recommendations concept.\n\nAcceptance criteria:\n- GET /api/recommendations returns a list of products\n- Logic is simple (e.g., top sellers, random, or rule-based)\n- Implementation is clearly separated so it can be swapped by ML later",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             },
             {
               "type": "feature",
@@ -412,13 +412,13 @@
                   "title": "Display recommendations on home and product pages",
                   "description": "As a shopper, I want to see recommended products in relevant places, so that I can discover more items I might like.\n\nAcceptance criteria:\n- Home page shows a recommendations section using data from the API\n- Product detail page shows a recommendations or related products section\n- Components are reusable so ML-based data can be plugged in later",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             }
           ],
-          "status": "not-started"
+          "status": "completed"
         },
         {
           "type": "epic",

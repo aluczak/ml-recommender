@@ -9,6 +9,7 @@ from sqlalchemy import func, or_, select
 
 from ..db import get_session
 from ..models import Product
+from ..serializers import serialize_product
 
 products_bp = Blueprint("products", __name__)
 
@@ -24,19 +25,6 @@ def _parse_positive_int(value: str | None, *, default: int, minimum: int, maximu
         raise ValueError(f"Must be between {minimum} and {maximum}")
     return parsed
 
-
-def _serialize_product(product: Product) -> dict[str, object]:
-    return {
-        "id": product.id,
-        "name": product.name,
-        "description": product.description,
-        "category": product.category,
-        "price": float(product.price),
-        "currency": product.currency,
-        "image_url": product.image_url,
-        "created_at": product.created_at.isoformat() if product.created_at else None,
-        "updated_at": product.updated_at.isoformat() if product.updated_at else None,
-    }
 
 
 @products_bp.get("/products")
@@ -107,7 +95,7 @@ def list_products():  # type: ignore[override]
 
     return jsonify(
         {
-            "items": [_serialize_product(product) for product in items],
+            "items": [serialize_product(product) for product in items],
             "pagination": {
                 "page": page,
                 "page_size": page_size,
@@ -133,7 +121,7 @@ def get_product(product_id: int):  # type: ignore[override]
     product = session.get(Product, product_id)
     if product is None:
         return {"error": f"Product {product_id} not found"}, 404
-    return jsonify(_serialize_product(product))
+    return jsonify(serialize_product(product))
 
 
 @products_bp.get("/products/<int:product_id>/related")
@@ -173,4 +161,4 @@ def get_related_products(product_id: int):  # type: ignore[override]
         stmt_fallback = stmt_fallback.order_by(price_diff, Product.id.asc()).limit(remaining)
         related.extend(session.scalars(stmt_fallback).all())
 
-    return jsonify({"items": [_serialize_product(item) for item in related]})
+    return jsonify({"items": [serialize_product(item) for item in related]})
