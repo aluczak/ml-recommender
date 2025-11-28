@@ -127,6 +127,8 @@ The SPA uses Vite + React Router with a flat-configured ESLint (`eslint.config.j
 - `/cart` lets authenticated users review their server-side cart, tweak quantities, remove items, and run a mock checkout. The UI talks to dedicated cart endpoints via a `CartProvider` that keeps token handling consistent.
 - Product detail pages now include an "Add to cart" button that wires directly into the cart context; checkout success has a confirmation screen at `/cart/confirmation` summarizing the order reference returned by the API.
 - Catalog/product detail/related card interactions fire `click`/`view`/`add_to_cart` events via a lightweight logger that uses `navigator.sendBeacon` when possible; backend cart mutations also log `update_cart` and `pseudo_purchase` events so the ML pipeline has both anonymous and authenticated signals.
+- A refreshed design system (global CSS variables, gradients, cards, responsive layout) keeps the header, hero blocks, catalog grid, cart, and auth screens visually consistent without additional component libraries.
+- Reusable `StatusMessage` and `LoadingIndicator` components render the loading/error/empty states for catalog, detail, auth, and cart flows so users always see what is happening.
 - Home and product detail routes include a reusable `RecommendationsSection` component that calls `/api/recommendations`, shows rule-based placeholder suggestions, and emits interaction logs so the ML stack can later compare placeholder vs. learned behavior.
 - The catalog route (`/catalog`) now includes a search box, category dropdown, and sort controls; every change re-queries the backend list endpoint so results stay in sync with API capabilities.
 

@@ -435,10 +435,10 @@
                   "title": "Apply a consistent visual style to the SPA",
                   "description": "As a shopper, I want the shop to look cohesive and pleasant, so that browsing feels like a real application and not a prototype.\n\nAcceptance criteria:\n- A base color palette and typography are defined and applied\n- Header, footer, and main content follow a consistent layout\n- Desktop layout is usable without major visual glitches",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             },
             {
               "type": "feature",
@@ -450,13 +450,13 @@
                   "title": "Show clear loading and error messages for core flows",
                   "description": "As a shopper, I want to understand when data is loading or if something went wrong, so that I am not confused by blank screens or failures.\n\nAcceptance criteria:\n- Catalog, detail, auth, and cart views show a spinner or skeleton while loading\n- Network or server errors show friendly error messages\n- 404 route shows a not-found page for unknown URLs",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             }
           ],
-          "status": "not-started"
+          "status": "completed"
         },
         {
           "type": "epic",

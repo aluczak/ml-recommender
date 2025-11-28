@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { formatPrice } from "../utils/format";
+import StatusMessage from "../components/StatusMessage";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 const Cart = () => {
   const { user } = useAuth();
@@ -12,17 +14,20 @@ const Cart = () => {
   const [checkingOut, setCheckingOut] = useState(false);
 
   const requireAuthMessage = !user ? (
-    <div className="status">
-      <p>You need to log in to manage your cart.</p>
-      <div className="cta-row">
-        <Link to="/login" className="button">
-          Log in
-        </Link>
-        <Link to="/signup" className="button button-secondary">
-          Create account
-        </Link>
-      </div>
-    </div>
+    <StatusMessage
+      actions={
+        <>
+          <Link to="/login" className="button">
+            Log in
+          </Link>
+          <Link to="/signup" className="button button-secondary">
+            Create account
+          </Link>
+        </>
+      }
+    >
+      You need to log in to manage your cart.
+    </StatusMessage>
   ) : null;
 
   const handleQuantity = async (itemId: number, nextQuantity: number) => {
@@ -79,29 +84,42 @@ const Cart = () => {
         <p>All items are stored server-side so you keep progress across sessions.</p>
       </header>
 
-      {loading && <p className="status status-loading">Loading cart…</p>}
+      {loading && (
+        <StatusMessage variant="loading">
+          <LoadingIndicator label="Loading cart…" />
+        </StatusMessage>
+      )}
+
       {error && !loading && (
-        <div className="status status-error" role="alert">
-          <p>{error}</p>
-          <button type="button" className="button button-secondary" onClick={() => refreshCart()}>
-            Retry
-          </button>
-        </div>
+        <StatusMessage
+          variant="error"
+          role="alert"
+          actions={
+            <button type="button" className="button button-secondary" onClick={() => refreshCart()}>
+              Retry
+            </button>
+          }
+        >
+          {error}
+        </StatusMessage>
       )}
 
       {cart && cart.items.length === 0 && !loading && (
-        <div className="status">
-          <p>Your cart is empty. Browse the catalog to add items.</p>
-          <Link to="/catalog" className="button">
-            Explore catalog
-          </Link>
-        </div>
+        <StatusMessage
+          actions={
+            <Link to="/catalog" className="button">
+              Explore catalog
+            </Link>
+          }
+        >
+          Your cart is empty. Browse the catalog to add items.
+        </StatusMessage>
       )}
 
       {actionError && (
-        <div className="status status-error" role="alert">
-          <p>{actionError}</p>
-        </div>
+        <StatusMessage variant="error" role="alert">
+          {actionError}
+        </StatusMessage>
       )}
 
       {cart && cart.items.length > 0 && (

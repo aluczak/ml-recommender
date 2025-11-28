@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import StatusMessage from "../components/StatusMessage";
 
 const Signup = () => {
   const { register, initializing } = useAuth();
@@ -74,9 +75,9 @@ const Signup = () => {
             />
           </label>
           {error && (
-            <p className="status status-error" role="alert">
+            <StatusMessage variant="error" role="alert">
               {error}
-            </p>
+            </StatusMessage>
           )}
           <button type="submit" className="button" disabled={submitting}>
             {submitting ? "Creating account…" : "Sign up"}

@@ -7,6 +7,8 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { sendInteraction } from "../utils/interactions";
 import RecommendationsSection from "../components/RecommendationsSection";
+import StatusMessage from "../components/StatusMessage";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 const RELATED_LIMIT = 4;
 
@@ -165,19 +167,24 @@ const ProductDetail = () => {
         </Link>
       </div>
 
-      {isLoading && <p className="status status-loading">Loading product…</p>}
+      {isLoading && (
+        <StatusMessage variant="loading">
+          <LoadingIndicator label="Loading product…" />
+        </StatusMessage>
+      )}
 
       {status === "error" && error && (
-        <div className="status status-error" role="alert">
-          <p>{error}</p>
-          <button
-            type="button"
-            className="button button-secondary"
-            onClick={() => hydratePage()}
-          >
-            Try again
-          </button>
-        </div>
+        <StatusMessage
+          variant="error"
+          role="alert"
+          actions={
+            <button type="button" className="button button-secondary" onClick={() => hydratePage()}>
+              Try again
+            </button>
+          }
+        >
+          {error}
+        </StatusMessage>
       )}
 
       {product && (

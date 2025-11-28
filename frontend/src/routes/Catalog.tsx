@@ -5,6 +5,8 @@ import { formatPrice } from "../utils/format";
 import type { Product } from "../types/product";
 import { sendInteraction } from "../utils/interactions";
 import { useAuth } from "../context/AuthContext";
+import StatusMessage from "../components/StatusMessage";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 const PAGE_SIZE = 12;
 
@@ -216,19 +218,36 @@ const Catalog = () => {
         </p>
       )}
 
-      {loading && <p className="status status-loading">Loading catalog…</p>}
+      {loading && (
+        <StatusMessage variant="loading">
+          <LoadingIndicator label="Loading catalog…" />
+        </StatusMessage>
+      )}
 
       {error && !loading && (
-        <div className="status status-error" role="alert">
-          <p>{error}</p>
-          <button type="button" className="button button-secondary" onClick={retryFetch}>
-            Try again
-          </button>
-        </div>
+        <StatusMessage
+          variant="error"
+          role="alert"
+          actions={
+            <button type="button" className="button button-secondary" onClick={retryFetch}>
+              Try again
+            </button>
+          }
+        >
+          {error}
+        </StatusMessage>
       )}
 
       {!loading && !error && products.length === 0 && (
-        <p className="status">No products available yet. Seed the database to get started.</p>
+        <StatusMessage
+          actions={
+            <button type="button" className="button button-secondary" onClick={resetFilters}>
+              Reset filters
+            </button>
+          }
+        >
+          No products available yet. Seed the database to get started.
+        </StatusMessage>
       )}
 
       {!loading && !error && products.length > 0 && (
