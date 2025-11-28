@@ -1,0 +1,75 @@
+name: Terraform Shared Infra
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "infra/terraform-shared/**"
+      - ".github/workflows/terraform-shared.yml"
+  workflow_dispatch:
+
+env:
+  TF_VERSION: "1.6.6"
+  TF_WORKING_DIR: "infra/terraform-shared"
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      ARM_ACCESS_KEY: ${{ secrets.TF_STATE_STORAGE_KEY }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Write terraform.tfvars
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          cat <<'EOF' > terraform.tfvars
+          ${{ secrets.TF_SHARED_TFVARS }}
+          EOF
+
+      - name: Configure backend
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          cat <<'EOF' > backend.conf
+          storage_account_name = "${{ secrets.TF_STATE_STORAGE }}"
+          container_name       = "${{ secrets.TF_STATE_CONTAINER }}"
+          key                  = "${{ secrets.TF_STATE_KEY_SHARED }}"
+          EOF
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform init -backend-config=backend.conf
+
+      - name: Terraform Validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform validate
+
+      - name: Terraform Plan
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform plan -out=tfplan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform apply -auto-approve tfplan
+
+      - name: Cleanup sensitive files
+        if: always()
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          rm -f terraform.tfvars backend.conf tfplan

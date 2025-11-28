@@ -1,0 +1,27 @@
+subscription_id  = "00000000-0000-0000-0000-000000000000"
+tenant_id        = "00000000-0000-0000-0000-000000000000"
+project_name     = "ml-recommender"
+environment      = "dev"
+location         = "eastus"
+shared_state_path = "../terraform-shared/terraform.tfstate"
+
+postgres_admin_username             = "mlshopadmin"
+postgres_admin_password_secret_name = "postgres-admin-password"
+app_secret_key_secret_name          = "backend-secret-key"
+database_url_secret_name            = "backend-database-url"
+
+postgres_version             = "16"
+postgres_sku_name            = "Standard_B1ms"
+postgres_storage_mb          = 32768
+postgres_backup_retention_days = 7
+
+app_service_sku            = "B1"
+app_service_container_port = 8000
+
+enable_zone_redundant = false
+
+initial_container_image = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
+
+tags = {
+  owner = "your-name"
+}

@@ -1,8 +1,8 @@
-subscription_id             = "00000000-0000-0000-0000-000000000000"
-tenant_id                   = "00000000-0000-0000-0000-000000000000"
+subscription_id             = "041b333e-05af-4e85-90c8-3c3c661641ee"
+tenant_id                   = "1dc9b339-fadb-432e-86df-423c38a0fcb8"
 project_name               = "ml-recommender"
 environment                = "dev"
-location                   = "eastus"
+location                   = "northeurope"
 postgres_admin_username    = "mlshopadmin"
 postgres_admin_password_secret_name = "postgres-admin-password"
 app_secret_key_secret_name = "backend-secret-key"
@@ -17,5 +17,5 @@ key_vault_purge_protection = false
 static_site_index_document = "index.html"
 static_site_error_document = "index.html"
 tags = {
-  owner = "your-name"
+  owner = "Adam Luczak"
 }

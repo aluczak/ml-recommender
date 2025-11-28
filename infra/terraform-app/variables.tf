@@ -32,6 +32,12 @@ variable "tags" {
   default     = {}
 }
 
+variable "shared_state_path" {
+  description = "Path (relative to this module) to the terraform-shared state file when using the local backend."
+  type        = string
+  default     = "../terraform-shared/terraform.tfstate"
+}
+
 variable "postgres_admin_username" {
   description = "Administrator username for the PostgreSQL flexible server (without @servername suffix)."
   type        = string
@@ -63,9 +69,9 @@ variable "postgres_storage_mb" {
 }
 
 variable "postgres_sku_name" {
-  description = "SKU for PostgreSQL flexible server (e.g., Standard_D2ads_v5)."
+  description = "SKU for PostgreSQL flexible server (e.g., Standard_B1ms)."
   type        = string
-  default     = "Standard_D2ads_v5"
+  default     = "Standard_B1ms"
 }
 
 variable "postgres_backup_retention_days" {
@@ -90,42 +96,6 @@ variable "app_service_container_port" {
   description = "Internal port exposed by the backend container."
   type        = number
   default     = 8000
-}
-
-variable "acr_sku" {
-  description = "Container registry SKU (Basic, Standard, or Premium)."
-  type        = string
-  default     = "Basic"
-}
-
-variable "key_vault_sku" {
-  description = "SKU for Azure Key Vault (standard or premium)."
-  type        = string
-  default     = "standard"
-}
-
-variable "key_vault_purge_protection" {
-  description = "Enable purge protection on the Key Vault (cannot be disabled for 90 days)."
-  type        = bool
-  default     = false
-}
-
-variable "storage_account_replication" {
-  description = "Replication strategy for the storage account (LRS, GRS, RA-GRS, etc.)."
-  type        = string
-  default     = "LRS"
-}
-
-variable "static_site_index_document" {
-  description = "Index document served by the static website for the frontend."
-  type        = string
-  default     = "index.html"
-}
-
-variable "static_site_error_document" {
-  description = "Error document served for unmatched routes (SPA fallback)."
-  type        = string
-  default     = "index.html"
 }
 
 variable "enable_zone_redundant" {
