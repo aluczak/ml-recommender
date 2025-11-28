@@ -518,10 +518,10 @@
                   "title": "Define minimal Azure resources for app and DB",
                   "description": "As a developer, I want a single Azure environment for the shop, so that I can deploy and access the app in the cloud.\n\nAcceptance criteria:\n- Resources include Azure App Service (or containers) for backend\n- Resources include hosting for frontend and Azure PostgreSQL flexible server\n- Resource definitions are captured in Terraform or scripts (even if simple)",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             },
             {
               "type": "feature",
@@ -533,13 +533,13 @@
                   "title": "Automate build and deployment to Azure",
                   "description": "As a developer, I want a simple CI/CD workflow for this project, so that I can deploy changes with minimal manual steps.\n\nAcceptance criteria:\n- GitHub Actions workflow builds backend and frontend\n- Workflow deploys to the defined Azure resources on push to main (or on demand)\n- Secrets and connection strings are stored securely via GitHub/Azure config",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             }
           ],
-          "status": "not-started"
+          "status": "completed"
         },
         {
           "type": "epic",
@@ -580,7 +580,7 @@
           "status": "not-started"
         }
       ],
-      "status": "in-progress"
+      "status": "completed"
     },
     {
       "type": "milestone",

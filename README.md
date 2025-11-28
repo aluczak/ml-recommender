@@ -140,6 +140,23 @@ The SPA uses Vite + React Router with a flat-configured ESLint (`eslint.config.j
 - **Environment flow:** Compose injects `DATABASE_URL` and other secrets directly; no `.env` file is required for the container stack. If you do provide a root `.env`, it is ignored by Docker builds via `.dockerignore`.
 - **Database prep inside containers:** after the stack is running for the first time, apply migrations with `docker compose exec backend alembic upgrade head` and seed products via `docker compose exec backend python scripts/seed_products.py --reset`.
 
+## Azure Infrastructure (Terraform)
+- Terraform code lives in `infra/terraform`; copy `terraform.tfvars.example` to `terraform.tfvars`, fill in subscription/tenant IDs, passwords, and naming preferences, then run `terraform init && terraform apply`.
+- Provisioned resources: resource group, Azure Container Registry, Linux App Service plan + Web App (containerized backend), PostgreSQL Flexible Server (`appdb`), a Storage account with static website hosting for the SPA bundle, and an Azure Key Vault that houses the database admin password / `SECRET_KEY` / `DATABASE_URL` secrets.
+- Required inputs include the secret *names* (`postgres_admin_password_secret_name`, `app_secret_key_secret_name`, `database_url_secret_name`), `subscription_id`, `tenant_id`, and any scaling tweaks (App Service SKU, PostgreSQL SKU, replication strategy). All resources are tagged automatically with project + environment metadata.
+- Initial run workflow: `terraform apply -target=azurerm_key_vault.main`, add the secrets manually (matching the configured names), then run `terraform apply` normally so Terraform can read the admin password value for PostgreSQL. App Service app settings rely on Key Vault references, so no secret values live in the Terraform codebase.
+- See `infra/README.md` for the full workflow plus prerequisites (Terraform 1.6+, Azure CLI/service principal with Contributor + Storage Blob Data Contributor roles).
+
+## CI/CD (GitHub Actions → Azure)
+- Workflow file: `.github/workflows/deploy.yml`. It runs on pushes to `main` or manually, builds the SPA via Vite, builds/pushes the backend container to ACR, configures the App Service to pull the new digest, and uploads the static assets to the storage account's `$web` container.
+- Required repository secrets:
+	- `AZURE_CREDENTIALS`: JSON export from `az ad sp create-for-rbac` (clientId, clientSecret, tenantId, subscriptionId).
+	- `AZURE_RESOURCE_GROUP`, `AZURE_WEBAPP_NAME`, `AZURE_STORAGE_ACCOUNT`: match the names emitted by Terraform outputs.
+	- `ACR_NAME` and `ACR_LOGIN_SERVER`: the registry short name (without `.azurecr.io`) and the full login server (`exampleacr.azurecr.io`).
+- Runtime application secrets are hydrated from Key Vault, so the workflow does not need `DATABASE_URL` or `SECRET_KEY` values directly—just ensure Terraform has provisioned the vault and that the required secrets exist before deployments run.
+- Ensure the service principal used in `AZURE_CREDENTIALS` has `Contributor` on the resource group and `Storage Blob Data Contributor` on the storage account so `az storage blob upload-batch --auth-mode login` succeeds.
+- Frontend uploads leverage the Terraform-enabled static website support, so the SPA behaves correctly with client-side routing (404 fallback to `index.html`).
+
 ## Next Steps
 - Flesh out catalog/database foundations and initial API endpoints.
 - Keep updating this README as major components (local orchestration, deployment flows, ML integration) are implemented.
