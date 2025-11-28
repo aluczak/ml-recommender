@@ -299,10 +299,10 @@
                   "title": "Implement cart CRUD endpoints",
                   "description": "As a authenticated user, I want to manage items in my cart, so that I can prepare a set of products I intend to buy.\n\nAcceptance criteria:\n- Endpoints exist to get cart, add item, update quantity, and remove item\n- Cart is persisted per user in the database\n- Cart totals can be computed on the backend",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             },
             {
               "type": "feature",
@@ -314,20 +314,20 @@
                   "title": "Allow users to view and edit cart in SPA",
                   "description": "As a authenticated user, I want to see and update my cart items, so that I can adjust what I plan to purchase.\n\nAcceptance criteria:\n- Cart page shows current items, quantities, and subtotal\n- User can change quantities and remove items from the cart\n- Changes are persisted via the backend cart API",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 },
                 {
                   "type": "user story",
                   "title": "Provide a mock checkout confirmation flow",
                   "description": "As a learner, I want to complete a checkout-like flow without real payments, so that I can simulate a full shopping journey.\n\nAcceptance criteria:\n- User can click a checkout button from the cart page\n- App displays a confirmation screen summarizing the order\n- No real payment or external integration is performed",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             }
           ],
-          "status": "not-started"
+          "status": "completed"
         },
         {
           "type": "epic",

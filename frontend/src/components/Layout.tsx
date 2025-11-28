@@ -1,10 +1,12 @@
 import { NavLink } from "react-router-dom";
 import type { ReactNode } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 
 const navigation = [
   { to: "/", label: "Home" },
   { to: "/catalog", label: "Catalog" },
+  { to: "/cart", label: "Cart" },
 ];
 
 interface LayoutProps {
@@ -13,7 +15,9 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const { user, logout } = useAuth();
+  const { cart } = useCart();
   const displayName = user?.full_name?.trim() || user?.email;
+  const cartCount = cart?.item_count ?? 0;
 
   return (
     <div className="app-shell">
@@ -24,7 +28,8 @@ const Layout = ({ children }: LayoutProps) => {
             {navigation.map((link) => (
               <li key={link.to}>
                 <NavLink to={link.to} className={({ isActive }) => (isActive ? "active" : "")}>
-                  {link.label}
+                  <span>{link.label}</span>
+                  {link.to === "/cart" && cartCount > 0 && <span className="cart-pill">{cartCount}</span>}
                 </NavLink>
               </li>
             ))}

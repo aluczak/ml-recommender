@@ -13,9 +13,9 @@ const Home = () => (
         <Link to="/catalog" className="button">
           Explore catalog
         </Link>
-        <button className="button button-secondary" type="button" disabled>
-          Personalized picks (coming soon)
-        </button>
+        <Link to="/cart" className="button button-secondary">
+          View your cart
+        </Link>
       </div>
     </div>
   </section>

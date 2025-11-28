@@ -3,6 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { API_BASE_URL } from "../config";
 import { formatPrice } from "../utils/format";
 import type { Product } from "../types/product";
+import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 const RELATED_LIMIT = 4;
 
@@ -16,6 +18,10 @@ const ProductDetail = () => {
   const [related, setRelated] = useState<Product[]>([]);
   const [status, setStatus] = useState<FetchState>("idle");
   const [error, setError] = useState<string | null>(null);
+  const [cartMessage, setCartMessage] = useState<string | null>(null);
+  const [cartMessageType, setCartMessageType] = useState<"success" | "error" | null>(null);
+  const { addItem, mutating } = useCart();
+  const { user } = useAuth();
 
   const productUrl = useMemo(() => {
     if (!productId) {
@@ -92,6 +98,29 @@ const ProductDetail = () => {
 
   const isLoading = status === "loading" && !product;
 
+  const handleAddToCart = async () => {
+    if (!product) {
+      return;
+    }
+    if (!user) {
+      setCartMessage("Log in to add items to your cart.");
+      setCartMessageType("error");
+      return;
+    }
+    setCartMessage(null);
+    setCartMessageType(null);
+    try {
+      await addItem(product.id, 1);
+      setCartMessage(`${product.name} added to your cart.`);
+      setCartMessageType("success");
+    } catch (err) {
+      setCartMessage(
+        err instanceof Error ? err.message : "Unable to add this item right now."
+      );
+      setCartMessageType("error");
+    }
+  };
+
   return (
     <section className="product-detail">
       <div className="detail-header">
@@ -129,13 +158,23 @@ const ProductDetail = () => {
               <span className="product-id">SKU #{product.id}</span>
             </div>
             <div className="product-actions">
-              <button type="button" className="button" disabled>
-                Add to cart (coming soon)
+              <button
+                type="button"
+                className="button"
+                onClick={handleAddToCart}
+                disabled={mutating}
+              >
+                {mutating ? "Adding…" : "Add to cart"}
               </button>
-              <button type="button" className="button button-secondary" disabled>
-                Save for later
-              </button>
+              <Link to="/cart" className="button button-secondary">
+                Go to cart
+              </Link>
             </div>
+            {cartMessage && (
+              <p className={`status ${cartMessageType === "error" ? "status-error" : "status"}`}>
+                {cartMessage}
+              </p>
+            )}
           </div>
         </article>
       )}

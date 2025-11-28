@@ -5,31 +5,18 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from flask import Blueprint, current_app, g, jsonify, request
+from flask import Blueprint, jsonify, request
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 
-from ..config import AppConfig
+from ..auth_helpers import issue_access_token, resolve_authenticated_user
 from ..db import get_session
 from ..models import User
-from ..security import (
-    TokenError,
-    decode_access_token,
-    generate_access_token,
-    hash_password,
-    verify_password,
-)
+from ..security import hash_password, verify_password
 
 auth_bp = Blueprint("auth", __name__)
 
 _EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
-
-
-def _require_app_config() -> AppConfig:
-    config = current_app.config.get("APP_CONFIG")
-    if not isinstance(config, AppConfig):  # pragma: no cover - defensive branch
-        raise RuntimeError("Application configuration is missing")
-    return config
 
 
 def _serialize_user(user: User) -> dict[str, Any]:
@@ -46,47 +33,6 @@ def _normalize_email(value: str | None) -> str:
     if not value or not isinstance(value, str):
         return ""
     return value.strip().lower()
-
-
-def _issue_token(user: User) -> tuple[str, int]:
-    config = _require_app_config()
-    expires_in = max(60, config.access_token_exp_minutes * 60)
-    token = generate_access_token(user.id, current_app.config["SECRET_KEY"])
-    return token, expires_in
-
-
-def _extract_bearer_token() -> str | None:
-    header_value = request.headers.get("Authorization")
-    if not header_value:
-        return None
-    parts = header_value.strip().split()
-    if len(parts) != 2 or parts[0].lower() != "bearer":
-        return None
-    return parts[1]
-
-
-def _resolve_authenticated_user() -> tuple[User | None, str | None]:
-    token = _extract_bearer_token()
-    if not token:
-        return None, "Missing access token"
-
-    config = _require_app_config()
-    try:
-        token_data = decode_access_token(
-            token,
-            current_app.config["SECRET_KEY"],
-            config.access_token_exp_minutes * 60,
-        )
-    except TokenError as exc:
-        return None, str(exc)
-
-    session = get_session()
-    user = session.get(User, token_data.user_id)
-    if user is None:
-        return None, "User referenced by token no longer exists"
-
-    g.current_user = user
-    return user, None
 
 
 @auth_bp.post("/auth/register")
@@ -129,7 +75,7 @@ def register_user():  # type: ignore[override]
         session.rollback()
         return jsonify({"error": "Email is already registered."}), 409
 
-    token, expires_in = _issue_token(user)
+    token, expires_in = issue_access_token(user)
     return (
         jsonify(
             {
@@ -157,7 +103,7 @@ def login_user():  # type: ignore[override]
     if user is None or not verify_password(password, user.hashed_password):
         return jsonify({"error": "Invalid email or password."}), 401
 
-    token, expires_in = _issue_token(user)
+    token, expires_in = issue_access_token(user)
     return jsonify(
         {
             "user": _serialize_user(user),
@@ -170,9 +116,9 @@ def login_user():  # type: ignore[override]
 
 @auth_bp.get("/auth/me")
 def get_current_user_profile():  # type: ignore[override]
-    user, error_message = _resolve_authenticated_user()
+    user, error_message, status_code = resolve_authenticated_user()
     if user is None:
-        return jsonify({"error": error_message or "Authentication required."}), 401
+        return jsonify({"error": error_message or "Authentication required."}), status_code
     return jsonify({"user": _serialize_user(user)})
 
 
