@@ -132,6 +132,14 @@ The SPA uses Vite + React Router with a flat-configured ESLint (`eslint.config.j
 - Home and product detail routes include a reusable `RecommendationsSection` component that calls `/api/recommendations`, shows rule-based placeholder suggestions, and emits interaction logs so the ML stack can later compare placeholder vs. learned behavior.
 - The catalog route (`/catalog`) now includes a search box, category dropdown, and sort controls; every change re-queries the backend list endpoint so results stay in sync with API capabilities.
 
+## Containers & Docker Compose
+
+- **Backend container:** `backend/Dockerfile` builds a Python 3.11 image, installs `requirements.txt` (served via Gunicorn), and exposes port `8000`. Build it with `docker build -t mlshop-backend ./backend` and configure via the usual environment variables (`DATABASE_URL`, `SECRET_KEY`, etc.).
+- **Frontend container:** `frontend/Dockerfile` performs a Vite production build inside Node 20, then serves the static assets with NGINX (port `4173`). Pass `--build-arg VITE_API_BASE_URL=<url>` if you need the SPA to call a non-default backend host.
+- **Local stack:** `docker-compose.yml` wires Postgres 16, the backend, and the frontend. Bring everything up with `docker compose up --build` and browse `http://localhost:5173`; the backend API is reachable at `http://localhost:5000/api`, and Postgres is exposed on `localhost:5432` with `mlshop/mlshop` credentials.
+- **Environment flow:** Compose injects `DATABASE_URL` and other secrets directly; no `.env` file is required for the container stack. If you do provide a root `.env`, it is ignored by Docker builds via `.dockerignore`.
+- **Database prep inside containers:** after the stack is running for the first time, apply migrations with `docker compose exec backend alembic upgrade head` and seed products via `docker compose exec backend python scripts/seed_products.py --reset`.
+
 ## Next Steps
 - Flesh out catalog/database foundations and initial API endpoints.
 - Keep updating this README as major components (local orchestration, deployment flows, ML integration) are implemented.

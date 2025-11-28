@@ -473,17 +473,17 @@
                   "title": "Create Dockerfile for backend service",
                   "description": "As a developer, I want to run the backend in a container, so that local and cloud environments are consistent.\n\nAcceptance criteria:\n- Backend Dockerfile builds a working image that can serve the API\n- Image uses environment variables for configuration\n- Build steps are documented in README",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 },
                 {
                   "type": "user story",
                   "title": "Create Dockerfile or containerized build for frontend",
                   "description": "As a developer, I want to build and serve the SPA via a container, so that deployment can be container-based if desired.\n\nAcceptance criteria:\n- Frontend Dockerfile builds a production-ready SPA\n- Static assets can be served via a minimal web server or the backend\n- Build and run commands are documented",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             },
             {
               "type": "feature",
@@ -495,13 +495,13 @@
                   "title": "Define docker-compose for backend, frontend, and DB",
                   "description": "As a developer, I want to spin up the full stack with a single command, so that local development and demos are easy.\n\nAcceptance criteria:\n- docker-compose.yml (or Podman equivalent) defines backend, frontend, and PostgreSQL services\n- One command starts the stack and makes the app accessible in a browser\n- Environment variables are managed via an .env file",
                   "sub-issues": [],
-                  "status": "not-started"
+                  "status": "completed"
                 }
               ],
-              "status": "not-started"
+              "status": "completed"
             }
           ],
-          "status": "not-started"
+          "status": "completed"
         },
         {
           "type": "epic",

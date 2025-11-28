@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: mlshop-db
+    environment:
+      POSTGRES_DB: mlshop
+      POSTGRES_USER: mlshop
+      POSTGRES_PASSWORD: mlshop
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mlshop -d mlshop"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mlshop-backend
+    environment:
+      APP_ENV: container
+      FLASK_DEBUG: "0"
+      SECRET_KEY: please-change-me
+      DATABASE_URL: postgresql+psycopg://mlshop:mlshop@db:5432/mlshop
+      ACCESS_TOKEN_EXP_MINUTES: 120
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "5000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:5000/api
+    container_name: mlshop-frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:4173"
+
+volumes:
+  db_data:
