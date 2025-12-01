@@ -98,6 +98,24 @@ variable "app_service_container_port" {
   default     = 8000
 }
 
+variable "storage_account_replication" {
+  description = "Replication strategy for the frontend storage account (LRS, GRS, etc.)."
+  type        = string
+  default     = "LRS"
+}
+
+variable "static_site_index_document" {
+  description = "Index document served by the static website for the frontend."
+  type        = string
+  default     = "index.html"
+}
+
+variable "static_site_error_document" {
+  description = "Error document served for unmatched SPA routes."
+  type        = string
+  default     = "index.html"
+}
+
 variable "enable_zone_redundant" {
   description = "Whether to enable zone redundant configuration for supported resources."
   type        = bool

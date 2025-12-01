@@ -23,21 +23,6 @@ output "key_vault_uri" {
   value       = azurerm_key_vault.shared.vault_uri
 }
 
-output "storage_account_id" {
-  description = "Resource ID of the frontend storage account."
-  value       = azurerm_storage_account.frontend.id
-}
-
-output "storage_account_name" {
-  description = "Name of the frontend storage account."
-  value       = azurerm_storage_account.frontend.name
-}
-
-output "storage_primary_web_endpoint" {
-  description = "Primary endpoint serving the frontend static website."
-  value       = azurerm_storage_account.frontend.primary_web_endpoint
-}
-
 output "container_registry_name" {
   description = "Name of the Azure Container Registry."
   value       = azurerm_container_registry.acr.name
@@ -51,4 +36,20 @@ output "container_registry_login_server" {
 output "container_registry_admin_username" {
   description = "Admin-enabled username for the container registry (useful for bootstrapping CI)."
   value       = azurerm_container_registry.acr.admin_username
+}
+
+output "tfstate_storage_account_name" {
+  description = "Storage account used to host Terraform state blobs."
+  value       = azurerm_storage_account.tfstate.name
+}
+
+output "tfstate_storage_account_primary_key" {
+  description = "Primary access key for the Terraform state storage account (handle securely)."
+  value       = azurerm_storage_account.tfstate.primary_access_key
+  sensitive   = true
+}
+
+output "tfstate_container_name" {
+  description = "Name of the private container that stores Terraform state blobs."
+  value       = azurerm_storage_container.tfstate.name
 }

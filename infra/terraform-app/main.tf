@@ -6,6 +6,11 @@ locals {
   resource_group_name = "${local.name_prefix}-app-rg"
   service_plan_name   = "${local.name_prefix}-plan"
   web_app_name        = "${local.name_prefix}-api"
+  storage_account_name = substr(
+    "${local.normalized_project}${local.normalized_env}sa",
+    0,
+    24
+  )
   postgres_server_name = substr(
     "${local.normalized_project}${local.normalized_env}pg",
     0,
@@ -31,7 +36,8 @@ data "terraform_remote_state" "shared" {
 }
 
 data "azurerm_key_vault" "shared" {
-  id = data.terraform_remote_state.shared.outputs.key_vault_id
+  name                = data.terraform_remote_state.shared.outputs.key_vault_name
+  resource_group_name = data.terraform_remote_state.shared.outputs.resource_group_name
 }
 
 resource "azurerm_resource_group" "app" {
@@ -47,6 +53,26 @@ resource "azurerm_service_plan" "api" {
   os_type             = "Linux"
   sku_name            = var.app_service_sku
   tags                = local.tags
+}
+
+resource "azurerm_storage_account" "frontend" {
+  name                     = local.storage_account_name
+  resource_group_name      = azurerm_resource_group.app.name
+  location                 = azurerm_resource_group.app.location
+  account_tier             = "Standard"
+  account_replication_type = var.storage_account_replication
+  access_tier              = "Hot"
+  allow_nested_items_to_be_public = true
+  https_traffic_only_enabled      = true
+  account_kind                    = "StorageV2"
+  min_tls_version                 = "TLS1_2"
+  tags                            = local.tags
+}
+
+resource "azurerm_storage_account_static_website" "frontend" {
+  storage_account_id = azurerm_storage_account.frontend.id
+  index_document     = var.static_site_index_document
+  error_404_document = var.static_site_error_document
 }
 
 data "azurerm_key_vault_secret" "postgres_admin_password" {

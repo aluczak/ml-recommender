@@ -5,8 +5,8 @@ locals {
 
   resource_group_name = "${local.name_prefix}-shared-rg"
   key_vault_name      = substr("${local.name_prefix}-kv", 0, 24)
-  storage_account_name = substr(
-    "${local.normalized_project}${local.normalized_env}sa",
+  state_storage_account_name = substr(
+    "${local.normalized_project}${local.normalized_env}tfstate",
     0,
     24
   )
@@ -43,24 +43,23 @@ resource "azurerm_container_registry" "acr" {
   tags                = local.tags
 }
 
-resource "azurerm_storage_account" "frontend" {
-  name                     = local.storage_account_name
+resource "azurerm_storage_account" "tfstate" {
+  name                     = local.state_storage_account_name
   resource_group_name      = azurerm_resource_group.shared.name
   location                 = azurerm_resource_group.shared.location
   account_tier             = "Standard"
-  account_replication_type = var.storage_account_replication
-  access_tier              = "Hot"
-  allow_nested_items_to_be_public = true
+  account_replication_type = var.tfstate_account_replication
+  allow_nested_items_to_be_public = false
   https_traffic_only_enabled      = true
   account_kind                    = "StorageV2"
   min_tls_version                 = "TLS1_2"
   tags                            = local.tags
 }
 
-resource "azurerm_storage_account_static_website" "frontend" {
-  storage_account_id = azurerm_storage_account.frontend.id
-  index_document     = var.static_site_index_document
-  error_404_document = var.static_site_error_document
+resource "azurerm_storage_container" "tfstate" {
+  name                  = "tfstate"
+  storage_account_name  = azurerm_storage_account.tfstate.name
+  container_access_type = "private"
 }
 
 resource "azurerm_key_vault" "shared" {

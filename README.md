@@ -141,10 +141,9 @@ The SPA uses Vite + React Router with a flat-configured ESLint (`eslint.config.j
 - **Database prep inside containers:** after the stack is running for the first time, apply migrations with `docker compose exec backend alembic upgrade head` and seed products via `docker compose exec backend python scripts/seed_products.py --reset`.
 
 ## Azure Infrastructure (Terraform)
-- Terraform now ships as two stacks: `infra/terraform-shared` (resource group, ACR, Key Vault, storage/static website) and `infra/terraform-app` (app resource group, App Service, PostgreSQL, Key Vault access policy). Apply the shared stack first, add the required secrets to the Key Vault, then apply the app stack (which reads the shared outputs via `terraform_remote_state`).
+- Terraform now ships as two stacks: `infra/terraform-shared` (resource group, ACR, Key Vault, and the storage account/container that host Terraform state) and `infra/terraform-app` (app resource group, App Service, PostgreSQL, frontend storage + static site hosting, and the Key Vault access policy). Apply the shared stack first, add the required secrets to the Key Vault, then apply the app stack (which reads the shared outputs via `terraform_remote_state`).
 - Required inputs include the secret *names* (`postgres_admin_password_secret_name`, `app_secret_key_secret_name`, `database_url_secret_name`), `subscription_id`, `tenant_id`, and any scaling tweaks (App Service SKU, PostgreSQL SKU). All resources are tagged automatically with project + environment metadata.
 - The app stack references the shared Key Vault via secret URIs, so no secret values live in the Terraform codebase. The shared stack grants your identity `get/list/set` so you can bootstrap the secrets manually.
-- `.github/workflows/terraform-shared.yml` can automatically deploy the shared stack when provided with the storage backend secrets plus a tfvars payload; mirror it for the app stack once its remote backend is defined.
 - See `infra/README.md` for prerequisites plus detailed instructions on running both stacks locally and in CI (Terraform 1.6+, Azure CLI/service principal with Contributor + Storage Blob Data Contributor roles).
 
 ## CI/CD (GitHub Actions → Azure)

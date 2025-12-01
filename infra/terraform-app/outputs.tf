@@ -8,6 +8,16 @@ output "backend_web_app_url" {
   value       = azurerm_linux_web_app.api.default_hostname
 }
 
+output "frontend_storage_account_name" {
+  description = "Name of the storage account serving the frontend static site."
+  value       = azurerm_storage_account.frontend.name
+}
+
+output "frontend_static_site_url" {
+  description = "Primary endpoint serving the frontend static website."
+  value       = azurerm_storage_account.frontend.primary_web_endpoint
+}
+
 output "postgres_fqdn" {
   description = "Fully qualified domain name for the PostgreSQL flexible server."
   value       = azurerm_postgresql_flexible_server.db.fqdn

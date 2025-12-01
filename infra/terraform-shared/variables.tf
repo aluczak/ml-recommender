@@ -50,20 +50,8 @@ variable "key_vault_purge_protection" {
   default     = false
 }
 
-variable "storage_account_replication" {
-  description = "Replication strategy for the storage account (LRS, GRS, RA-GRS, etc.)."
+variable "tfstate_account_replication" {
+  description = "Replication strategy for the Terraform state storage account (LRS, GRS, etc.)."
   type        = string
   default     = "LRS"
-}
-
-variable "static_site_index_document" {
-  description = "Index document served by the static website for the frontend."
-  type        = string
-  default     = "index.html"
-}
-
-variable "static_site_error_document" {
-  description = "Error document served for unmatched routes (SPA fallback)."
-  type        = string
-  default     = "index.html"
 }
