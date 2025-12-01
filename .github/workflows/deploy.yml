@@ -24,6 +24,12 @@ jobs:
       AZURE_STORAGE_ACCOUNT: ${{ vars.AZURE_STORAGE_ACCOUNT }}
       ACR_NAME: ${{ vars.ACR_NAME }}
       ACR_LOGIN_SERVER: ${{ vars.ACR_LOGIN_SERVER }}
+      TF_PROJECT_NAME: ${{ vars.TF_PROJECT_NAME }}
+      TF_ENVIRONMENT: ${{ vars.TF_ENVIRONMENT }}
+      AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
+      SHARED_RESOURCE_GROUP: ${{ vars.SHARED_RESOURCE_GROUP }}
+      SHARED_KEY_VAULT_NAME: ${{ vars.SHARED_KEY_VAULT_NAME }}
+      SHARED_KEY_VAULT_URI: ${{ vars.SHARED_KEY_VAULT_URI }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -49,6 +55,23 @@ jobs:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy app infrastructure (Terraform)
+        working-directory: infra/terraform-app
+        env:
+          TF_VAR_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          TF_VAR_tenant_id: ${{ vars.AZURE_TENANT_ID }}
+          TF_VAR_project_name: ${{ env.TF_PROJECT_NAME }}
+          TF_VAR_environment: ${{ env.TF_ENVIRONMENT }}
+          TF_VAR_location: ${{ env.AZURE_LOCATION }}
+          TF_VAR_shared_resource_group_name: ${{ env.SHARED_RESOURCE_GROUP }}
+          TF_VAR_shared_key_vault_name: ${{ env.SHARED_KEY_VAULT_NAME }}
+          TF_VAR_shared_key_vault_uri: ${{ env.SHARED_KEY_VAULT_URI }}
+          TF_VAR_frontend_storage_account_name: ${{ env.AZURE_STORAGE_ACCOUNT }}
+        run: |
+          terraform init -input=false
+          terraform plan -input=false -out=tfplan
+          terraform apply -input=false -auto-approve tfplan
 
       - name: Docker login to ACR
         run: az acr login --name "$ACR_NAME"
