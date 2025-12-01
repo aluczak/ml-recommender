@@ -10,7 +10,7 @@ key_vault_purge_protection = false
 tfstate_account_replication = "LRS"
 enable_github_oidc         = true
 github_app_display_name    = "mlshop-github-ci"
-github_oidc_subject        = "repo:aluczak/ml-recommender:ref:refs/heads/main"
+github_oidc_subject        = "repo:aluczak/ml-recommender:environment:dev"
 
 tags = {
   owner = "Adam Luczak"
