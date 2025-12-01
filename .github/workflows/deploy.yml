@@ -49,6 +49,11 @@ jobs:
         working-directory: frontend
         run: npm run build
 
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.5
+
       - name: Azure login (OIDC)
         uses: azure/login@v2
         with:
