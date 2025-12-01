@@ -154,7 +154,7 @@ The SPA uses Vite + React Router with a flat-configured ESLint (`eslint.config.j
 	- `ACR_NAME` and `ACR_LOGIN_SERVER` – registry short name (no `.azurecr.io`) and fully qualified login server.
 - Define `frontend_storage_account_name` in `infra/terraform-app/terraform.tfvars` (or read it from the Terraform output) and reuse the same value for `AZURE_STORAGE_ACCOUNT` so infrastructure and CI stay in sync.
 - Runtime application secrets are hydrated from Key Vault, so the workflow does not need `DATABASE_URL` or `SECRET_KEY` values directly—just ensure Terraform has provisioned the vault and that the manual secrets (`postgres-admin-password`, `backend-secret-key`) exist before deployments run (Terraform writes the `backend-database-url` secret automatically).
-- The Azure AD application must have `Contributor` on the app resource group and `Storage Blob Data Contributor` on the frontend storage account so `az webapp` and `az storage blob upload-batch --auth-mode login` succeed.
+- The shared Terraform stack now grants that Azure AD application `Contributor` and `Storage Blob Data Contributor` at the subscription scope, so the workflow has both control-plane and blob data access without extra manual RBAC.
 - Frontend uploads leverage the Terraform-enabled static website support, so the SPA behaves correctly with client-side routing (404 fallback to `index.html`).
 
 ## Next Steps

@@ -45,6 +45,7 @@ Destroy environments with `terraform destroy` inside each stack when experimenti
 - `postgres_admin_password_secret_name`, `app_secret_key_secret_name`, `database_url_secret_name` – secret names the app relies on; the first two must exist before running the app stack, while Terraform now writes the database URL secret automatically
 - `postgres_admin_username`, `postgres_sku_name`, `app_service_sku` – performance knobs per environment
 - `enable_github_oidc`, `github_app_display_name`, `github_oidc_subject` – control whether the shared stack provisions an Azure AD application + federated credential for GitHub Actions
+- When `enable_github_oidc` is true, the shared stack also grants that service principal the `Contributor` and `Storage Blob Data Contributor` roles at the subscription scope so GitHub workflows can deploy resources and upload frontend assets without extra RBAC steps
 
 ## Outputs
 - **Shared stack**: resource group/location, Key Vault ID/name/URI, Terraform-state storage account/container details, container registry info, and (if enabled) the Azure AD application/service principal identifiers for GitHub Actions.

@@ -109,3 +109,17 @@ resource "azuread_application_federated_identity_credential" "github_ci" {
   audiences             = ["api://AzureADTokenExchange"]
   subject               = var.github_oidc_subject
 }
+
+resource "azurerm_role_assignment" "github_ci_contributor" {
+  count                = var.enable_github_oidc ? 1 : 0
+  scope                = "/subscriptions/${var.subscription_id}"
+  role_definition_name = "Contributor"
+  principal_id         = azuread_service_principal.github_ci[0].object_id
+}
+
+resource "azurerm_role_assignment" "github_ci_blob_data" {
+  count                = var.enable_github_oidc ? 1 : 0
+  scope                = "/subscriptions/${var.subscription_id}"
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azuread_service_principal.github_ci[0].object_id
+}
