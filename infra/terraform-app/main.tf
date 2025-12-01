@@ -6,10 +6,14 @@ locals {
   resource_group_name = "${local.name_prefix}-app-rg"
   service_plan_name   = "${local.name_prefix}-plan"
   web_app_name        = "${local.name_prefix}-api"
-  storage_account_name = substr(
+  default_storage_account_name = substr(
     "${local.normalized_project}${local.normalized_env}sa",
     0,
     24
+  )
+  storage_account_name = coalesce(
+    var.frontend_storage_account_name,
+    local.default_storage_account_name
   )
   postgres_server_name = substr(
     "${local.normalized_project}${local.normalized_env}pg",
@@ -27,17 +31,9 @@ locals {
   )
 }
 
-data "terraform_remote_state" "shared" {
-  backend = "local"
-
-  config = {
-    path = abspath("${path.module}/${var.shared_state_path}")
-  }
-}
-
 data "azurerm_key_vault" "shared" {
-  name                = data.terraform_remote_state.shared.outputs.key_vault_name
-  resource_group_name = data.terraform_remote_state.shared.outputs.resource_group_name
+  name                = var.shared_key_vault_name
+  resource_group_name = var.shared_resource_group_name
 }
 
 resource "azurerm_resource_group" "app" {
@@ -118,6 +114,23 @@ resource "azurerm_postgresql_flexible_server_database" "app" {
   collation = "en_US.utf8"
 }
 
+locals {
+  postgres_connection_string = format(
+    "postgresql+psycopg://%s:%s@%s:5432/%s?sslmode=require",
+    var.postgres_admin_username,
+    urlencode(data.azurerm_key_vault_secret.postgres_admin_password.value),
+    azurerm_postgresql_flexible_server.db.fqdn,
+    azurerm_postgresql_flexible_server_database.app.name
+  )
+}
+
+resource "azurerm_key_vault_secret" "database_url" {
+  name         = var.database_url_secret_name
+  key_vault_id = data.azurerm_key_vault.shared.id
+  value        = local.postgres_connection_string
+  content_type = "text/plain"
+}
+
 resource "azurerm_linux_web_app" "api" {
   name                = local.web_app_name
   resource_group_name = azurerm_resource_group.app.name
@@ -144,14 +157,14 @@ resource "azurerm_linux_web_app" "api" {
     "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "false"
     "DATABASE_URL" = format(
       "@Microsoft.KeyVault(SecretUri=%s)",
-      format("%ssecrets/%s", data.terraform_remote_state.shared.outputs.key_vault_uri, var.database_url_secret_name)
+      format("%ssecrets/%s", var.shared_key_vault_uri, var.database_url_secret_name)
     )
     "SECRET_KEY" = format(
       "@Microsoft.KeyVault(SecretUri=%s)",
-      format("%ssecrets/%s", data.terraform_remote_state.shared.outputs.key_vault_uri, var.app_secret_key_secret_name)
+      format("%ssecrets/%s", var.shared_key_vault_uri, var.app_secret_key_secret_name)
     )
     "SCM_DO_BUILD_DURING_DEPLOYMENT" = "false"
-    "KEY_VAULT_URI"                  = data.terraform_remote_state.shared.outputs.key_vault_uri
+    "KEY_VAULT_URI"                  = var.shared_key_vault_uri
   }
 
   tags = local.tags

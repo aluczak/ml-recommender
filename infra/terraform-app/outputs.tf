@@ -25,14 +25,14 @@ output "postgres_fqdn" {
 
 output "key_vault_uri" {
   description = "URI of the shared Azure Key Vault storing application secrets."
-  value       = data.terraform_remote_state.shared.outputs.key_vault_uri
+  value       = var.shared_key_vault_uri
 }
 
 output "key_vault_secret_uris" {
   description = "Helper map of Key Vault secret URIs the app expects (no secret values)."
   value = {
-    postgres_admin_password = format("%ssecrets/%s", data.terraform_remote_state.shared.outputs.key_vault_uri, var.postgres_admin_password_secret_name)
-    backend_secret_key      = format("%ssecrets/%s", data.terraform_remote_state.shared.outputs.key_vault_uri, var.app_secret_key_secret_name)
-    database_url            = format("%ssecrets/%s", data.terraform_remote_state.shared.outputs.key_vault_uri, var.database_url_secret_name)
+    postgres_admin_password = format("%ssecrets/%s", var.shared_key_vault_uri, var.postgres_admin_password_secret_name)
+    backend_secret_key      = format("%ssecrets/%s", var.shared_key_vault_uri, var.app_secret_key_secret_name)
+    database_url            = format("%ssecrets/%s", var.shared_key_vault_uri, var.database_url_secret_name)
   }
 }

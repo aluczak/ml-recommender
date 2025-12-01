@@ -26,6 +26,12 @@ variable "environment" {
   default     = "dev"
 }
 
+variable "shared_namespace" {
+  description = "Optional logical namespace for shared resources; defaults to project_name when unset."
+  type        = string
+  default     = null
+}
+
 variable "tags" {
   description = "Optional map of tags to spread across all shared resources."
   type        = map(string)
@@ -54,4 +60,22 @@ variable "tfstate_account_replication" {
   description = "Replication strategy for the Terraform state storage account (LRS, GRS, etc.)."
   type        = string
   default     = "LRS"
+}
+
+variable "enable_github_oidc" {
+  description = "Whether to create an Azure AD application/service principal with a GitHub Actions federated credential."
+  type        = bool
+  default     = true
+}
+
+variable "github_app_display_name" {
+  description = "Display name for the Azure AD application used by GitHub Actions."
+  type        = string
+  default     = "mlshop-github-ci"
+}
+
+variable "github_oidc_subject" {
+  description = "OIDC subject string GitHub will use (e.g., repo:owner/repo:ref:refs/heads/main)."
+  type        = string
+  default     = "repo:aluczak/ml-recommender:ref:refs/heads/main"
 }

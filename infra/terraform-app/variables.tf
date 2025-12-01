@@ -32,10 +32,19 @@ variable "tags" {
   default     = {}
 }
 
-variable "shared_state_path" {
-  description = "Path (relative to this module) to the terraform-shared state file when using the local backend."
+variable "shared_resource_group_name" {
+  description = "Name of the resource group created by the shared stack (hosts the Key Vault)."
   type        = string
-  default     = "../terraform-shared/terraform.tfstate"
+}
+
+variable "shared_key_vault_name" {
+  description = "Name of the shared Key Vault that stores application secrets."
+  type        = string
+}
+
+variable "shared_key_vault_uri" {
+  description = "Vault URI used for Key Vault references (e.g., https://<name>.vault.azure.net/)."
+  type        = string
 }
 
 variable "postgres_admin_username" {
@@ -102,6 +111,20 @@ variable "storage_account_replication" {
   description = "Replication strategy for the frontend storage account (LRS, GRS, etc.)."
   type        = string
   default     = "LRS"
+}
+
+variable "frontend_storage_account_name" {
+  description = "Optional override for the frontend storage account name (24 lowercase alphanumerics)."
+  type        = string
+  default     = null
+
+  validation {
+    condition = var.frontend_storage_account_name == null || (
+      length(var.frontend_storage_account_name) <= 24 &&
+      can(regex("^[a-z0-9]+$", var.frontend_storage_account_name))
+    )
+    error_message = "front end storage account names must be lowercase alphanumeric and no longer than 24 characters."
+  }
 }
 
 variable "static_site_index_document" {

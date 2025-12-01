@@ -141,19 +141,20 @@ The SPA uses Vite + React Router with a flat-configured ESLint (`eslint.config.j
 - **Database prep inside containers:** after the stack is running for the first time, apply migrations with `docker compose exec backend alembic upgrade head` and seed products via `docker compose exec backend python scripts/seed_products.py --reset`.
 
 ## Azure Infrastructure (Terraform)
-- Terraform now ships as two stacks: `infra/terraform-shared` (resource group, ACR, Key Vault, and the storage account/container that host Terraform state) and `infra/terraform-app` (app resource group, App Service, PostgreSQL, frontend storage + static site hosting, and the Key Vault access policy). Apply the shared stack first, add the required secrets to the Key Vault, then apply the app stack (which reads the shared outputs via `terraform_remote_state`).
+- Terraform now ships as two stacks: `infra/terraform-shared` (resource group, ACR, Key Vault, the storage account/container that host Terraform state, plus an optional GitHub Actions Azure AD app + federated credential) and `infra/terraform-app` (app resource group, App Service, PostgreSQL, frontend storage + static site hosting, and the Key Vault access policy). Apply the shared stack first, add the manual secrets (`postgres-admin-password`, `backend-secret-key`) to the Key Vault, then apply the app stack while supplying the shared resource group + Key Vault identifiers via variables (copied from the shared stack outputs). The app stack composes the `backend-database-url` secret automatically once PostgreSQL exists.
 - Required inputs include the secret *names* (`postgres_admin_password_secret_name`, `app_secret_key_secret_name`, `database_url_secret_name`), `subscription_id`, `tenant_id`, and any scaling tweaks (App Service SKU, PostgreSQL SKU). All resources are tagged automatically with project + environment metadata.
 - The app stack references the shared Key Vault via secret URIs, so no secret values live in the Terraform codebase. The shared stack grants your identity `get/list/set` so you can bootstrap the secrets manually.
 - See `infra/README.md` for prerequisites plus detailed instructions on running both stacks locally and in CI (Terraform 1.6+, Azure CLI/service principal with Contributor + Storage Blob Data Contributor roles).
 
 ## CI/CD (GitHub Actions → Azure)
 - Workflow file: `.github/workflows/deploy.yml`. It runs on pushes to `main` or manually, builds the SPA via Vite, builds/pushes the backend container to ACR, configures the App Service to pull the new digest, and uploads the static assets to the storage account's `$web` container.
-- Required repository secrets:
-	- `AZURE_CREDENTIALS`: JSON export from `az ad sp create-for-rbac` (clientId, clientSecret, tenantId, subscriptionId).
-	- `AZURE_RESOURCE_GROUP`, `AZURE_WEBAPP_NAME`, `AZURE_STORAGE_ACCOUNT`: match the names emitted by Terraform outputs.
-	- `ACR_NAME` and `ACR_LOGIN_SERVER`: the registry short name (without `.azurecr.io`) and the full login server (`exampleacr.azurecr.io`).
-- Runtime application secrets are hydrated from Key Vault, so the workflow does not need `DATABASE_URL` or `SECRET_KEY` values directly—just ensure Terraform has provisioned the vault and that the required secrets exist before deployments run.
-- Ensure the service principal used in `AZURE_CREDENTIALS` has `Contributor` on the resource group and `Storage Blob Data Contributor` on the storage account so `az storage blob upload-batch --auth-mode login` succeeds.
+- Required GitHub **environment variables** (configured on the `dev` environment so OIDC permissions apply):
+	- `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` – identifiers for the Azure AD app/service principal created via Terraform for GitHub OIDC.
+	- `AZURE_RESOURCE_GROUP`, `AZURE_WEBAPP_NAME`, `AZURE_STORAGE_ACCOUNT` – names emitted by the app stack outputs.
+	- `ACR_NAME` and `ACR_LOGIN_SERVER` – registry short name (no `.azurecr.io`) and fully qualified login server.
+- Define `frontend_storage_account_name` in `infra/terraform-app/terraform.tfvars` (or read it from the Terraform output) and reuse the same value for `AZURE_STORAGE_ACCOUNT` so infrastructure and CI stay in sync.
+- Runtime application secrets are hydrated from Key Vault, so the workflow does not need `DATABASE_URL` or `SECRET_KEY` values directly—just ensure Terraform has provisioned the vault and that the manual secrets (`postgres-admin-password`, `backend-secret-key`) exist before deployments run (Terraform writes the `backend-database-url` secret automatically).
+- The Azure AD application must have `Contributor` on the app resource group and `Storage Blob Data Contributor` on the frontend storage account so `az webapp` and `az storage blob upload-batch --auth-mode login` succeed.
 - Frontend uploads leverage the Terraform-enabled static website support, so the SPA behaves correctly with client-side routing (404 fallback to `index.html`).
 
 ## Next Steps

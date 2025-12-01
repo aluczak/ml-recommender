@@ -53,3 +53,13 @@ output "tfstate_container_name" {
   description = "Name of the private container that stores Terraform state blobs."
   value       = azurerm_storage_container.tfstate.name
 }
+
+output "github_oidc_client_id" {
+  description = "Application (client) ID for the GitHub Actions Azure AD app."
+  value       = var.enable_github_oidc ? azuread_application.github_ci[0].client_id : null
+}
+
+output "github_oidc_service_principal_id" {
+  description = "Object ID for the GitHub Actions service principal."
+  value       = var.enable_github_oidc ? azuread_service_principal.github_ci[0].object_id : null
+}

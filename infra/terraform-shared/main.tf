@@ -1,17 +1,19 @@
 locals {
   normalized_project = lower(join("", regexall("[A-Za-z0-9]", var.project_name)))
   normalized_env     = lower(join("", regexall("[A-Za-z0-9]", var.environment)))
-  name_prefix        = substr("${local.normalized_project}-${local.normalized_env}", 0, 40)
+  shared_namespace   = coalesce(var.shared_namespace, var.project_name)
+  normalized_shared  = lower(join("", regexall("[A-Za-z0-9]", local.shared_namespace)))
+  shared_name_prefix = substr("${local.normalized_shared}-${local.normalized_env}", 0, 40)
 
-  resource_group_name = "${local.name_prefix}-shared-rg"
-  key_vault_name      = substr("${local.name_prefix}-kv", 0, 24)
+  resource_group_name = "${local.shared_name_prefix}-rg"
+  key_vault_name      = substr("${local.normalized_shared}${local.normalized_env}kv", 0, 24)
   state_storage_account_name = substr(
-    "${local.normalized_project}${local.normalized_env}tfstate",
+    "${local.normalized_shared}${local.normalized_env}shared",
     0,
     24
   )
   acr_name = substr(
-    "${local.normalized_project}${local.normalized_env}acr",
+    "${local.normalized_shared}${local.normalized_env}acr",
     0,
     50
   )
@@ -85,4 +87,25 @@ resource "azurerm_key_vault_access_policy" "current" {
     "List",
     "Set"
   ]
+}
+
+resource "azuread_application" "github_ci" {
+  count        = var.enable_github_oidc ? 1 : 0
+  display_name = var.github_app_display_name
+
+  owners = [data.azurerm_client_config.current.object_id]
+}
+
+resource "azuread_service_principal" "github_ci" {
+  count     = var.enable_github_oidc ? 1 : 0
+  client_id = azuread_application.github_ci[0].client_id
+}
+
+resource "azuread_application_federated_identity_credential" "github_ci" {
+  count           = var.enable_github_oidc ? 1 : 0
+  application_id  = "applications/${azuread_application.github_ci[0].object_id}"
+  display_name          = "github-actions"
+  issuer                = "https://token.actions.githubusercontent.com"
+  audiences             = ["api://AzureADTokenExchange"]
+  subject               = var.github_oidc_subject
 }
