@@ -12,8 +12,56 @@ env:
   FRONTEND_BUILD_DIR: "frontend/dist"
 
 jobs:
-  deploy:
+  build:
+    name: Build Artifacts
+    runs-on: ubuntu-latest
+    outputs:
+      backend_image_tag: ${{ steps.build_backend.outputs.backend_image_tag }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: ${{ env.FRONTEND_BUILD_DIR }}
+          if-no-files-found: error
+
+      - name: Build backend image
+        id: build_backend
+        run: |
+          BACKEND_IMAGE="${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}"
+          docker build -t "$BACKEND_IMAGE" backend
+          docker save "$BACKEND_IMAGE" -o backend-image.tar
+          echo "backend_image_tag=$BACKEND_IMAGE" >> "$GITHUB_OUTPUT"
+
+      - name: Upload backend image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-image
+          path: backend-image.tar
+          if-no-files-found: error
+
+  terraform:
+    name: Deploy Infrastructure
     environment: dev
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -33,21 +81,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Install frontend dependencies
-        working-directory: frontend
-        run: npm ci
-
-      - name: Build frontend
-        working-directory: frontend
-        run: npm run build
 
       - name: Azure login (OIDC)
         uses: azure/login@v2
@@ -109,17 +142,58 @@ jobs:
           TF_VAR_shared_key_vault_uri: ${{ env.SHARED_KEY_VAULT_URI }}
           TF_VAR_frontend_storage_account_name: ${{ env.AZURE_STORAGE_ACCOUNT }}
 
+  deploy:
+    name: Deploy Application
+    environment: dev
+    needs:
+      - build
+      - terraform
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+      AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME }}
+      AZURE_STORAGE_ACCOUNT: ${{ vars.AZURE_STORAGE_ACCOUNT }}
+      ACR_NAME: ${{ vars.ACR_NAME }}
+      ACR_LOGIN_SERVER: ${{ vars.ACR_LOGIN_SERVER }}
+      BACKEND_IMAGE_NAME: ${{ env.BACKEND_IMAGE_NAME }}
+      FRONTEND_ARTIFACT_DIR: frontend-dist
+    steps:
+      - name: Download frontend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: ${{ env.FRONTEND_ARTIFACT_DIR }}
+
+      - name: Download backend image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-image
+          path: backend-image
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Load backend image
+        run: docker load -i backend-image/backend-image.tar
+
       - name: Docker login to ACR
         run: az acr login --name "$ACR_NAME"
 
-      - name: Build backend image
-        run: |
-          BACKEND_IMAGE="$ACR_LOGIN_SERVER/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}"
-          echo "BACKEND_IMAGE=$BACKEND_IMAGE" >> "$GITHUB_ENV"
-          docker build -t "$BACKEND_IMAGE" backend
-
       - name: Push backend image
-        run: docker push "$BACKEND_IMAGE"
+        env:
+          LOCAL_IMAGE: ${{ needs.build.outputs.backend_image_tag }}
+        run: |
+          REMOTE_IMAGE="$ACR_LOGIN_SERVER/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}"
+          docker tag "$LOCAL_IMAGE" "$REMOTE_IMAGE"
+          docker push "$REMOTE_IMAGE"
+          echo "REMOTE_IMAGE=$REMOTE_IMAGE" >> "$GITHUB_ENV"
 
       - name: Capture ACR credentials for App Service
         run: |
@@ -133,7 +207,7 @@ jobs:
           az webapp config container set \
             --name "$AZURE_WEBAPP_NAME" \
             --resource-group "$AZURE_RESOURCE_GROUP" \
-            --docker-custom-image-name "$BACKEND_IMAGE" \
+            --docker-custom-image-name "$REMOTE_IMAGE" \
             --docker-registry-server-url "https://$ACR_LOGIN_SERVER" \
             --docker-registry-server-user "$ACR_USERNAME" \
             --docker-registry-server-password "$ACR_PASSWORD"
@@ -145,6 +219,6 @@ jobs:
             --account-name "$AZURE_STORAGE_ACCOUNT" \
             --auth-mode login \
             --destination '$web' \
-            --source "$FRONTEND_BUILD_DIR" \
+            --source "$FRONTEND_ARTIFACT_DIR" \
             --no-progress \
             --overwrite
