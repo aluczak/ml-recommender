@@ -1,0 +1,27 @@
+# Example Terraform variables file
+# Copy this file to terraform.tfvars and update with your values
+
+project_name = "mlshop"
+environment  = "prod"
+location     = "eastus"
+
+# Static Web App location (limited regions available)
+static_web_app_location = "eastus2"
+
+# Database configuration
+database_name = "mlshop"
+
+# Secrets (generate secure random values)
+postgresql_admin_password = "CHANGE_ME_secure_password_123!"
+app_secret_key            = "CHANGE_ME_generate_random_secret_key"
+
+# GitHub configuration for federated identity
+github_repository = "aluczak/ml-recommender"
+github_branch     = "main"
+
+# Optional: Custom tags
+tags = {
+  Project     = "ML Recommender Shop"
+  Environment = "Production"
+  ManagedBy   = "Terraform"
+}
