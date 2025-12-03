@@ -117,6 +117,8 @@ chmod +x deploy-local.sh
 
 This will create all Azure resources and output important values.
 
+**Note**: The App Service is initially configured with a placeholder Docker image reference. The service will not be fully functional until you build and push the actual backend image in the next step.
+
 ### Step 5: Build and Push Docker Images
 
 After infrastructure is deployed, build and push images:

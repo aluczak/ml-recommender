@@ -121,6 +121,18 @@ resource "azurerm_key_vault_secret" "database_url" {
   depends_on = [module.keyvault]
 }
 
+# Static Web App for Frontend (must be created before App Service for CORS config)
+module "static_web_app" {
+  source = "./modules/static_web_app"
+  
+  resource_group_name = azurerm_resource_group.main.name
+  location            = var.static_web_app_location
+  project_name        = var.project_name
+  environment         = var.environment
+  tags                = var.tags
+  backend_url         = ""  # Will be updated after App Service is created
+}
+
 # App Service for Backend
 module "app_service" {
   source = "./modules/app_service"
@@ -137,6 +149,7 @@ module "app_service" {
   key_vault_id              = module.keyvault.key_vault_id
   database_connection_string = module.postgresql.connection_string
   secret_key                = var.app_secret_key
+  static_web_app_hostname   = module.static_web_app.default_hostname
   tags                      = var.tags
 }
 
@@ -150,18 +163,6 @@ resource "azurerm_key_vault_access_policy" "app_service" {
     "Get",
     "List"
   ]
-}
-
-# Static Web App for Frontend
-module "static_web_app" {
-  source = "./modules/static_web_app"
-  
-  resource_group_name = azurerm_resource_group.main.name
-  location            = var.static_web_app_location
-  project_name        = var.project_name
-  environment         = var.environment
-  tags                = var.tags
-  backend_url         = module.app_service.default_hostname
 }
 
 # Federated Identity Credentials for GitHub Actions

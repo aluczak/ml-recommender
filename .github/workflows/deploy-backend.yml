@@ -80,9 +80,19 @@ jobs:
       - name: Run database migrations
         run: |
           echo "Running database migrations..."
-          az webapp ssh --name ${{ steps.app_service.outputs.name }} \
+          # Note: SSH to App Service may not be immediately available after restart
+          # If migrations fail, they can be run manually later
+          if az webapp ssh --name ${{ steps.app_service.outputs.name }} \
             --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-            --command "cd /app && alembic upgrade head" || true
+            --command "cd /app && alembic upgrade head" 2>&1 | tee migration.log; then
+            echo "Migrations completed successfully"
+          else
+            echo "Warning: Migration step failed or SSH not available"
+            echo "You may need to run migrations manually:"
+            echo "  az webapp ssh --name ${{ steps.app_service.outputs.name }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }}"
+            echo "  cd /app && alembic upgrade head"
+            cat migration.log || true
+          fi
       
       - name: Restart App Service
         run: |

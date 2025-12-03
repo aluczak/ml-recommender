@@ -19,7 +19,7 @@ resource "azurerm_linux_web_app" "main" {
     always_on = true
     
     application_stack {
-      docker_image_name   = "nginx:latest"  # Placeholder, will be updated by deployment
+      docker_image_name   = "${var.acr_login_server}/mlshop-backend:latest"
       docker_registry_url = "https://${var.acr_login_server}"
       docker_registry_username = var.acr_admin_username
       docker_registry_password = var.acr_admin_password
@@ -28,7 +28,11 @@ resource "azurerm_linux_web_app" "main" {
     health_check_path = "/api/health"
     
     cors {
-      allowed_origins = ["*"]  # Will be restricted to frontend URL in production
+      allowed_origins = [
+        "https://${var.static_web_app_hostname}",
+        "http://localhost:5173",  # Local development
+        "http://localhost:3000"   # Alternative local dev port
+      ]
       support_credentials = true
     }
   }

@@ -62,6 +62,12 @@ variable "secret_key" {
   sensitive   = true
 }
 
+variable "static_web_app_hostname" {
+  description = "Hostname of the Static Web App for CORS configuration"
+  type        = string
+  default     = ""
+}
+
 variable "tags" {
   description = "Tags to apply"
   type        = map(string)
