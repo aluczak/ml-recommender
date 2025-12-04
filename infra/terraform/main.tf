@@ -57,17 +57,6 @@ resource "azurerm_resource_group" "main" {
   tags = var.tags
 }
 
-# Virtual Network and Subnets
-module "network" {
-  source = "./modules/network"
-  
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
-  project_name        = var.project_name
-  environment         = var.environment
-  tags                = var.tags
-}
-
 # Azure Container Registry
 module "acr" {
   source = "./modules/acr"
@@ -96,7 +85,7 @@ module "keyvault" {
   admin_object_ids = [data.azurerm_client_config.current.object_id]
 }
 
-# PostgreSQL Flexible Server
+# PostgreSQL Flexible Server (publicly accessible for training purposes)
 module "postgresql" {
   source = "./modules/postgresql"
   
@@ -105,8 +94,6 @@ module "postgresql" {
   project_name            = var.project_name
   environment             = var.environment
   suffix                  = random_string.suffix.result
-  subnet_id               = module.network.database_subnet_id
-  private_dns_zone_id     = module.network.postgresql_private_dns_zone_id
   admin_password          = var.postgresql_admin_password
   database_name           = var.database_name
   tags                    = var.tags
@@ -142,7 +129,6 @@ module "app_service" {
   project_name              = var.project_name
   environment               = var.environment
   suffix                    = random_string.suffix.result
-  subnet_id                 = module.network.app_service_subnet_id
   acr_login_server          = module.acr.login_server
   acr_admin_username        = module.acr.admin_username
   acr_admin_password        = module.acr.admin_password

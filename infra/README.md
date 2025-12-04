@@ -9,10 +9,11 @@ The application is deployed using the following Azure services:
 - **Azure Container Registry (ACR)**: Stores Docker images for the backend
 - **Azure App Service**: Hosts the Flask backend application
 - **Azure Static Web Apps**: Hosts the React frontend
-- **Azure PostgreSQL Flexible Server**: Database with private networking
+- **Azure PostgreSQL Flexible Server**: Database with public access (training/dev configuration)
 - **Azure Key Vault**: Stores secrets and credentials
-- **Azure Virtual Network**: Provides private networking
 - **Federated Identity**: GitHub Actions authentication
+
+**Note**: This is a simplified configuration for training purposes with public access enabled. For production deployments, consider implementing private networking and VNet integration (see SECURITY_RECOMMENDATIONS.md).
 
 ## Prerequisites
 
@@ -350,15 +351,24 @@ az webapp restart --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP
 
 ### Database Connection Issues
 
-**Test connection from App Service:**
-```bash
-# SSH into App Service
-az webapp ssh --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP
+**PostgreSQL is publicly accessible** (training configuration), so you can connect from anywhere:
 
-# Test PostgreSQL connection
-apt-get update && apt-get install -y postgresql-client
+```bash
+# Get connection details from Terraform
+cd infra/terraform
+POSTGRES_FQDN=$(terraform output -raw postgresql_fqdn)
+POSTGRES_PASSWORD="your-password-from-tfvars"
+
+# Connect using psql
+psql "postgresql+psycopg://psqladmin:$POSTGRES_PASSWORD@$POSTGRES_FQDN:5432/mlshop?sslmode=require"
+
+# Or from App Service SSH
+az webapp ssh --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP
+# Inside container:
 psql "$DATABASE_URL" -c "SELECT version();"
 ```
+
+**Note**: The database allows connections from all IP addresses (0.0.0.0-255.255.255.255) for training purposes. This should be restricted in production environments.
 
 ## Cleanup
 

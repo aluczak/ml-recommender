@@ -24,13 +24,15 @@ variable "suffix" {
 }
 
 variable "subnet_id" {
-  description = "ID of the subnet for PostgreSQL"
+  description = "ID of the subnet for PostgreSQL (optional, leave null for public access)"
   type        = string
+  default     = null
 }
 
 variable "private_dns_zone_id" {
-  description = "ID of the private DNS zone"
+  description = "ID of the private DNS zone (optional, leave null for public access)"
   type        = string
+  default     = null
 }
 
 variable "admin_password" {

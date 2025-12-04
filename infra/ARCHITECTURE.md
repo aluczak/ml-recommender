@@ -1,6 +1,6 @@
 # Azure Infrastructure Architecture
 
-## High-Level Architecture
+## High-Level Architecture (Simplified for Training)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -17,23 +17,16 @@
     │  NGINX serving dist/   │      │   Docker Container     │
     └────────────────────────┘      └───────────┬────────────┘
                                                  │
-                                                 │ VNet Integration
+                                                 │ Direct Connection
+                                                 │ (No VNet)
                                                  │
-                ┌────────────────────────────────┴────────────────┐
-                │         Azure Virtual Network (10.0.0.0/16)     │
-                │                                                  │
-                │  ┌────────────────────┐  ┌──────────────────┐  │
-                │  │  App Service      │  │  Database        │  │
-                │  │  Subnet           │  │  Subnet          │  │
-                │  │  (10.0.1.0/24)    │  │  (10.0.2.0/24)   │  │
-                │  └────────────────────┘  └────────┬─────────┘  │
-                │                                    │             │
-                │                          ┌─────────▼─────────┐  │
-                │                          │   PostgreSQL      │  │
-                │                          │ Flexible Server   │  │
-                │                          │  (Private DNS)    │  │
-                │                          └───────────────────┘  │
-                └─────────────────────────────────────────────────┘
+                                     ┌───────────▼─────────┐
+                                     │   PostgreSQL        │
+                                     │ Flexible Server     │
+                                     │  (Public Access)    │
+                                     │  Firewall: 0.0.0.0  │
+                                     │  to 255.255.255.255 │
+                                     └─────────────────────┘
 
     ┌────────────────────────┐      ┌────────────────────────┐
     │ Azure Container        │      │   Azure Key Vault      │
@@ -48,6 +41,8 @@
     │ Blob: tfstate          │      │  CI/CD Workflows       │
     └────────────────────────┘      └────────────────────────┘
 ```
+
+**Note**: This is a simplified architecture for training/development purposes. Private networking has been removed to simplify SSH access and troubleshooting. For production, see SECURITY_RECOMMENDATIONS.md for implementing VNet integration and private endpoints.
 
 ## Network Flow
 

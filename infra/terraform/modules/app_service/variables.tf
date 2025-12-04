@@ -24,8 +24,9 @@ variable "suffix" {
 }
 
 variable "subnet_id" {
-  description = "ID of the subnet for VNet integration"
+  description = "ID of the subnet for VNet integration (optional, removed for public access)"
   type        = string
+  default     = null
 }
 
 variable "acr_login_server" {
