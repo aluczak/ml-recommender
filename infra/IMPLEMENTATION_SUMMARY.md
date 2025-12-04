@@ -23,9 +23,8 @@ This document summarizes the infrastructure code created for deploying the ML Re
    - ✅ Azure Container Registry (ACR) - stores Docker images
    - ✅ Azure App Service - hosts Flask backend
    - ✅ Azure Static Web Apps - hosts React frontend
-   - ✅ Azure PostgreSQL Flexible Server - database with private networking
+   - ✅ Azure PostgreSQL Flexible Server - database with public access (training/dev)
    - ✅ Azure Key Vault - secrets management
-   - ✅ Virtual Network - private networking infrastructure
    - ✅ Federated Identity Credentials - GitHub Actions authentication
 
 4. **Deployment Scripts**
@@ -45,7 +44,7 @@ This document summarizes the infrastructure code created for deploying the ML Re
 
 7. **Security Features**
    - ✅ Secrets stored in Azure Key Vault (never in code)
-   - ✅ PostgreSQL with private networking only
+   - ✅ PostgreSQL with public access (simplified for training/development)
    - ✅ Managed identities for App Service
    - ✅ Federated identity for GitHub Actions (no long-lived credentials)
    - ✅ HTTPS enforced on all endpoints
@@ -59,20 +58,18 @@ This document summarizes the infrastructure code created for deploying the ML Re
 Internet
    |
    ├─> Azure Static Web App (Frontend)
-   |      └─> https://swa-mlshop-prod.azurewebsites.net
+   |      └─> https://swa-mlshop-prod.azurestaticapps.net
    |
-   └─> Azure App Service (Backend)
-          └─> https://app-mlshop-backend-xxxxx.azurewebsites.net
-                 |
-                 └─> Virtual Network (10.0.0.0/16)
-                        |
-                        ├─> App Service Subnet (10.0.1.0/24)
-                        |      └─> VNet Integration
-                        |
-                        └─> Database Subnet (10.0.2.0/24)
-                               └─> PostgreSQL Flexible Server
-                                      └─> Private DNS Zone
+   ├─> Azure App Service (Backend)
+   |      └─> https://app-mlshop-backend-xxxxx.azurewebsites.net
+   |             └─> Direct SSL connection
+   |
+   └─> PostgreSQL Flexible Server (Public access for training)
+          └─> psql-mlshop-xxxxx.postgres.database.azure.com
+                 └─> SSL required, Firewall: 0.0.0.0-255.255.255.255
 ```
+
+**Note**: Simplified architecture for training/development. No VNet or private networking configured to simplify SSH access and troubleshooting.
 
 ### Resource Groups
 
@@ -81,12 +78,13 @@ Internet
 
 ### Key Design Decisions
 
-1. **Private Networking**: PostgreSQL is not accessible from the internet
-2. **VNet Integration**: App Service connects to database via private network
+1. **Public Access**: PostgreSQL is publicly accessible for training/development purposes
+2. **Simplified Networking**: No VNet to simplify SSH access and troubleshooting
 3. **Container Registry**: ACR stores all Docker images with version tags
 4. **Static Web Apps**: Free tier for frontend (sufficient for this use case)
 5. **Managed Identity**: App Service uses system-assigned identity for Key Vault access
 6. **Cost-Optimized SKUs**: B1/B1ms tiers for App Service and PostgreSQL (~$30-40/month)
+7. **SSL/TLS**: Required for all database connections
 
 ## Deployment Methods
 
@@ -153,10 +151,10 @@ The implementation minimizes manual steps through:
    - Secrets stored in Key Vault
    - GitHub secrets for CI/CD
 
-2. **Network Isolation**
-   - PostgreSQL only accessible via private network
-   - VNet integration for App Service
-   - Private DNS zone for database resolution
+2. **Network Security**
+   - PostgreSQL publicly accessible with SSL/TLS (simplified for training)
+   - All connections require SSL encryption
+   - Firewall rules configured for development access
 
 3. **Managed Identities**
    - App Service uses system-assigned identity
@@ -312,8 +310,7 @@ If issues arise during deployment:
 | Keep state in Azure Storage | ✅ | Remote backend with versioning enabled |
 | Deploy backend to App Service | ✅ | Linux App Service with Docker support |
 | Deploy frontend to Static Website | ✅ | Azure Static Web Apps |
-| Publicly accessible | ✅ | Both frontend and backend are public |
-| Private networking when possible | ✅ | PostgreSQL on private network |
+| Publicly accessible | ✅ | Frontend, backend, and database are public (training config) |
 | Store images in ACR | ✅ | Azure Container Registry configured |
 | Keep secrets in Key Vault | ✅ | Database connection strings and credentials |
 | Federated identity for GitHub | ✅ | OIDC authentication configured |
@@ -325,7 +322,7 @@ If issues arise during deployment:
 
 The infrastructure implementation is complete and ready for use. All requirements from the problem statement have been addressed with a focus on:
 
-- **Security**: Private networking, managed identities, no hardcoded secrets
+- **Security**: SSL/TLS encryption, managed identities, no hardcoded secrets (simplified for training)
 - **Automation**: Scripts and GitHub Actions for deployment
 - **Maintainability**: Modular Terraform code, comprehensive documentation
 - **Cost-effectiveness**: Optimal SKUs for development/learning
