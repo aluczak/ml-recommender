@@ -61,6 +61,7 @@ jobs:
           storage_account_name = "${{ secrets.TF_STATE_STORAGE_ACCOUNT }}"
           container_name       = "${{ secrets.TF_STATE_CONTAINER }}"
           key                  = "terraform.tfstate"
+          use_azuread_auth     = true
           EOF
           terraform init -backend-config=backend.hcl
       
@@ -85,6 +86,8 @@ jobs:
             -var="postgresql_admin_password=${{ secrets.POSTGRESQL_ADMIN_PASSWORD }}" \
             -var="app_secret_key=${{ secrets.APP_SECRET_KEY }}" \
             -var="github_repository=${{ github.repository }}" \
+            -var="tf_state_resource_group=${{ secrets.TF_STATE_RESOURCE_GROUP }}" \
+            -var="tf_state_storage_account=${{ secrets.TF_STATE_STORAGE_ACCOUNT }}" \
             -out=tfplan
       
       - name: Terraform Apply
@@ -109,7 +112,9 @@ jobs:
           terraform destroy -auto-approve \
             -var="postgresql_admin_password=${{ secrets.POSTGRESQL_ADMIN_PASSWORD }}" \
             -var="app_secret_key=${{ secrets.APP_SECRET_KEY }}" \
-            -var="github_repository=${{ github.repository }}"
+            -var="github_repository=${{ github.repository }}" \
+            -var="tf_state_resource_group=${{ secrets.TF_STATE_RESOURCE_GROUP }}" \
+            -var="tf_state_storage_account=${{ secrets.TF_STATE_STORAGE_ACCOUNT }}"
       
       - name: Output Terraform Results
         if: github.event.inputs.action == 'apply' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
