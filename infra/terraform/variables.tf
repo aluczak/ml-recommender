@@ -62,13 +62,13 @@ variable "tags" {
 }
 
 variable "tf_state_resource_group" {
-  description = "Resource group name for Terraform state storage (optional, for granting GitHub Actions access)"
+  description = "Resource group name for Terraform state storage (required for GitHub Actions access, leave empty if not using GitHub Actions)"
   type        = string
   default     = ""
 }
 
 variable "tf_state_storage_account" {
-  description = "Storage account name for Terraform state (optional, for granting GitHub Actions access)"
+  description = "Storage account name for Terraform state (required for GitHub Actions access, leave empty if not using GitHub Actions)"
   type        = string
   default     = ""
 }

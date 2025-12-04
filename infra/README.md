@@ -330,11 +330,11 @@ terraform apply
 **Option 2: Manually grant access**
 
 ```bash
-# Set these variables to match your configuration
-PROJECT_NAME="mlshop"                # From terraform.tfvars (project_name)
-ENVIRONMENT="prod"                   # From terraform.tfvars (environment)
-TF_STATE_RG="rg-mlshop-tfstate"      # From init-terraform-state.sh (resource group)
-TF_STATE_SA="mlshoptfstate"          # From init-terraform-state.sh (storage account)
+# Set these variables to match your configuration (update with your actual values)
+PROJECT_NAME="mlshop"                # From terraform.tfvars (project_name) - default: "mlshop"
+ENVIRONMENT="prod"                   # From terraform.tfvars (environment) - default: "prod"
+TF_STATE_RG="rg-mlshop-tfstate"      # From init-terraform-state.sh (resource group) - default shown
+TF_STATE_SA="mlshoptfstate"          # From init-terraform-state.sh (storage account) - default shown
 
 # Get the GitHub Actions service principal ID
 GITHUB_ACTIONS_SP_ID=$(az ad sp list \
