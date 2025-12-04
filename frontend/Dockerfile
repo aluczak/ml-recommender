@@ -5,7 +5,9 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 COPY package.json package-lock.json ./
-RUN npm ci
+# npm ci skips certain optional native rollup binaries on Alpine due to npm bug (#4828)
+# Fall back to npm install (lockfile still honored) so Linux builds remain reproducible.
+RUN npm install --include=optional
 
 COPY . .
 ARG VITE_API_BASE_URL=http://localhost:5000/api

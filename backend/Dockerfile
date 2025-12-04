@@ -8,9 +8,25 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
+# Install dependencies including OpenSSH for Azure App Service SSH support
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends build-essential \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        openssh-server \
     && rm -rf /var/lib/apt/lists/*
+
+# Configure SSH for Azure App Service
+RUN mkdir -p /var/run/sshd \
+    && echo "root:Docker!" | chpasswd \
+    && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
+    && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
+# Copy SSH configuration for Azure App Service
+COPY sshd_config /etc/ssh/
+
+# Copy startup script early and set permissions
+COPY startup.sh /usr/local/bin/startup.sh
+RUN chmod +x /usr/local/bin/startup.sh
 
 COPY requirements.txt ./
 RUN pip install --upgrade pip \
@@ -20,6 +36,6 @@ COPY . .
 RUN mkdir -p instance
 
 ENV PORT=8000
-EXPOSE 8000
+EXPOSE 8000 2222
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:create_app()"]
+CMD ["/usr/local/bin/startup.sh"]

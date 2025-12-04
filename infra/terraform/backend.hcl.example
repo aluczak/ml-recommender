@@ -1,0 +1,8 @@
+# Example backend configuration for Terraform state
+# Copy this file to backend.hcl and update with your values
+# Run init-terraform-state.sh first to create the storage account
+
+resource_group_name  = "rg-mlshop-tfstate"
+storage_account_name = "mlshoptfstate"
+container_name       = "tfstate"
+key                  = "terraform.tfstate"

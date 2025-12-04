@@ -1,0 +1,83 @@
+name: Deploy Frontend
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy-frontend.yml'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AZURE_RESOURCE_GROUP: rg-mlshop-prod
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy Frontend
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      
+      - name: Get backend URL
+        id: backend
+        run: |
+          APP_NAME=$(az webapp list \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --query "[?contains(name, 'backend')].name" -o tsv)
+          BACKEND_URL="https://${APP_NAME}.azurewebsites.net"
+          echo "url=$BACKEND_URL" >> $GITHUB_OUTPUT
+      
+      - name: Get Static Web App details
+        id: swa
+        run: |
+          SWA_NAME=$(az staticwebapp list \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --query "[0].name" -o tsv)
+          SWA_TOKEN=$(az staticwebapp secrets list \
+            --name $SWA_NAME \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --query "properties.apiKey" -o tsv)
+          echo "name=$SWA_NAME" >> $GITHUB_OUTPUT
+          echo "::add-mask::$SWA_TOKEN"
+          echo "token=$SWA_TOKEN" >> $GITHUB_OUTPUT
+      
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+      
+      - name: Build frontend
+        working-directory: frontend
+        env:
+          VITE_API_BASE_URL: ${{ steps.backend.outputs.url }}/api
+        run: npm run build
+      
+      - name: Deploy to Azure Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ steps.swa.outputs.token }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: 'upload'
+          app_location: 'frontend'
+          output_location: 'dist'
+          skip_app_build: true

@@ -19,6 +19,7 @@ Training project that builds a container-ready online shop with a React SPA fron
 ```
 backend/    # Flask application source (API, models, migrations)
 frontend/   # React SPA source (catalog UI, cart, auth flows)
+infra/      # Infrastructure as Code (Terraform, deployment scripts, docs)
 scripts/    # Utility scripts (data seeding, interaction export, etc.)
 backlog.json# Structured backlog that mirrors milestones/epics/user stories
 ```
@@ -138,3 +139,47 @@ The SPA uses Vite + React Router with a flat-configured ESLint (`eslint.config.j
 - **Local stack:** `docker-compose.yml` wires Postgres 16, the backend, and the frontend. Bring everything up with `docker compose up --build` and browse `http://localhost:5173`; the backend API is reachable at `http://localhost:5000/api`, and Postgres is exposed on `localhost:5432` with `mlshop/mlshop` credentials.
 - **Environment flow:** Compose injects `DATABASE_URL` and other secrets directly; no `.env` file is required for the container stack. If you do provide a root `.env`, it is ignored by Docker builds via `.dockerignore`.
 - **Database prep inside containers:** after the stack is running for the first time, apply migrations with `docker compose exec backend alembic upgrade head` and seed products via `docker compose exec backend python scripts/seed_products.py --reset`.
+
+## Azure Deployment
+
+The application can be deployed to Azure using Terraform infrastructure as code. All deployment resources are located in the `infra/` directory:
+
+- **Terraform templates**: Complete infrastructure definition with modular architecture
+- **Deployment scripts**: Automated scripts for local and CI/CD deployment
+- **GitHub Actions**: Workflows for automated infrastructure and application deployment
+- **Documentation**: Comprehensive guides for deployment and troubleshooting
+
+### Quick Start
+
+Deploy to Azure in ~15-20 minutes:
+
+```bash
+cd infra/scripts
+./init-terraform-state.sh      # Initialize Terraform state storage
+cd ../terraform
+cp terraform.tfvars.example terraform.tfvars  # Configure variables
+cd ../scripts
+./deploy-local.sh apply        # Deploy infrastructure
+./build-and-push.sh           # Build and push Docker images
+```
+
+For detailed instructions, see:
+- [infra/QUICKSTART.md](infra/QUICKSTART.md) - Step-by-step deployment guide
+- [infra/README.md](infra/README.md) - Complete infrastructure documentation
+
+### Azure Resources
+
+The deployment creates:
+- Azure Container Registry (ACR) for Docker images
+- Azure App Service (Linux) for Flask backend
+- Azure Static Web Apps for React frontend
+- Azure PostgreSQL Flexible Server (private networking)
+- Azure Key Vault for secrets management
+- Virtual Network with private endpoints
+- Federated identity for GitHub Actions (no long-lived credentials)
+
+### Cost Optimization
+
+Infrastructure uses cost-effective tiers suitable for development/learning:
+- Estimated monthly cost: ~$30-40 USD
+- All resources can be destroyed with a single command
