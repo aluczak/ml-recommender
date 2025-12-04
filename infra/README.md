@@ -330,15 +330,21 @@ terraform apply
 **Option 2: Manually grant access**
 
 ```bash
+# Set these variables to match your configuration
+PROJECT_NAME="mlshop"        # From terraform.tfvars
+ENVIRONMENT="prod"           # From terraform.tfvars
+TF_STATE_RG="rg-mlshop-tfstate"      # From init-terraform-state.sh
+TF_STATE_SA="mlshoptfstate"          # From init-terraform-state.sh
+
 # Get the GitHub Actions service principal ID
 GITHUB_ACTIONS_SP_ID=$(az ad sp list \
-  --display-name 'mlshop-github-actions-prod' \
+  --display-name "${PROJECT_NAME}-github-actions-${ENVIRONMENT}" \
   --query '[0].id' -o tsv)
 
 # Get the storage account ID
 STORAGE_ACCOUNT_ID=$(az storage account show \
-  --name mlshoptfstate \
-  --resource-group rg-mlshop-tfstate \
+  --name "$TF_STATE_SA" \
+  --resource-group "$TF_STATE_RG" \
   --query id -o tsv)
 
 # Grant Storage Blob Data Contributor role
