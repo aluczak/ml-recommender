@@ -327,6 +327,22 @@ az webapp log tail --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP
 az webapp ssh --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP
 ```
 
+**Note**: SSH access requires:
+1. The Docker container must have SSH configured (port 2222)
+2. The backend Dockerfile includes SSH setup with `sshd_config` and `startup.sh`
+3. After deploying a new image, wait 1-2 minutes for the container to fully start
+
+**If SSH fails with "SSH CONN CLOSE":**
+1. Verify the container is running: `az webapp show --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP --query state`
+2. Check container logs: `az webapp log tail --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP`
+3. Restart the app: `az webapp restart --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP`
+4. Wait 1-2 minutes and try SSH again
+
+**Alternative: Use Azure Portal SSH**
+1. Go to Azure Portal → App Service
+2. Navigate to "SSH" under Development Tools
+3. Click "Go" to open web-based SSH session
+
 **Restart app:**
 ```bash
 az webapp restart --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP

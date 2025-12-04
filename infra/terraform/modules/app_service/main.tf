@@ -38,14 +38,16 @@ resource "azurerm_linux_web_app" "main" {
   }
   
   app_settings = {
-    WEBSITES_PORT                    = "8000"
-    DOCKER_ENABLE_CI                 = "true"
-    APP_ENV                          = "production"
-    FLASK_DEBUG                      = "0"
-    SECRET_KEY                       = var.secret_key
-    DATABASE_URL                     = var.database_connection_string
-    ACCESS_TOKEN_EXP_MINUTES         = "120"
+    WEBSITES_PORT                       = "8000"
+    DOCKER_ENABLE_CI                    = "true"
+    APP_ENV                             = "production"
+    FLASK_DEBUG                         = "0"
+    SECRET_KEY                          = var.secret_key
+    DATABASE_URL                        = var.database_connection_string
+    ACCESS_TOKEN_EXP_MINUTES            = "120"
     WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
+    # Enable SSH for az webapp ssh command
+    SSH_PORT                            = "2222"
   }
   
   identity {

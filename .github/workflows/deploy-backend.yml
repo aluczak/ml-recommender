@@ -77,28 +77,39 @@ jobs:
             --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
             --docker-custom-image-name ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
       
-      - name: Run database migrations
-        run: |
-          echo "Running database migrations..."
-          # Note: SSH to App Service may not be immediately available after restart
-          # If migrations fail, they can be run manually later
-          if az webapp ssh --name ${{ steps.app_service.outputs.name }} \
-            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-            --command "cd /app && alembic upgrade head" 2>&1 | tee migration.log; then
-            echo "Migrations completed successfully"
-          else
-            echo "Warning: Migration step failed or SSH not available"
-            echo "You may need to run migrations manually:"
-            echo "  az webapp ssh --name ${{ steps.app_service.outputs.name }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }}"
-            echo "  cd /app && alembic upgrade head"
-            cat migration.log || true
-          fi
-      
       - name: Restart App Service
         run: |
           az webapp restart \
             --name ${{ steps.app_service.outputs.name }} \
             --resource-group ${{ env.AZURE_RESOURCE_GROUP }}
+          echo "Waiting for container to start (60 seconds)..."
+          sleep 60
+      
+      - name: Run database migrations
+        run: |
+          echo "Running database migrations..."
+          # Wait for SSH to become available, retry up to 3 times
+          for i in 1 2 3; do
+            echo "Attempt $i: Connecting to SSH..."
+            if az webapp ssh --name ${{ steps.app_service.outputs.name }} \
+              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+              --command "cd /app && alembic upgrade head" 2>&1 | tee migration.log; then
+              echo "✓ Migrations completed successfully"
+              exit 0
+            else
+              echo "✗ Attempt $i failed"
+              if [ $i -lt 3 ]; then
+                echo "Waiting 30 seconds before retry..."
+                sleep 30
+              fi
+            fi
+          done
+          
+          echo "Warning: Migration step failed after 3 attempts"
+          echo "The container may still be starting. You can run migrations manually:"
+          echo "  az webapp ssh --name ${{ steps.app_service.outputs.name }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }}"
+          echo "  cd /app && alembic upgrade head"
+          cat migration.log || true
       
       - name: Health check
         run: |

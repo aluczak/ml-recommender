@@ -108,8 +108,21 @@ az webapp restart --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP
 
 ### 8. Initialize Database (2 minutes)
 
+**Important**: Wait 1-2 minutes after deploying the backend container before attempting SSH.
+
 ```bash
-# SSH into App Service
+# SSH into App Service (may take 1-2 attempts if container just started)
+az webapp ssh --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP
+```
+
+If SSH fails with "SSH CONN CLOSE", try:
+```bash
+# Check if container is running
+az webapp show --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP --query state
+
+# Restart and wait
+az webapp restart --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP
+sleep 60
 az webapp ssh --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP
 ```
 
