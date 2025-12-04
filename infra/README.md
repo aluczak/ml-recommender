@@ -333,11 +333,15 @@ az webapp ssh --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP
 2. The backend Dockerfile includes SSH setup with `sshd_config` and `startup.sh`
 3. After deploying a new image, wait 1-2 minutes for the container to fully start
 
-**If SSH fails with "SSH CONN CLOSE":**
-1. Verify the container is running: `az webapp show --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP --query state`
-2. Check container logs: `az webapp log tail --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP`
-3. Restart the app: `az webapp restart --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP`
-4. Wait 1-2 minutes and try SSH again
+**If SSH fails with "SSH CONN CLOSE" or container won't start:**
+1. Check container logs: `az webapp log tail --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP`
+2. If you see `exec /usr/local/bin/startup.sh: no such file or directory`, the shell scripts may have CRLF line endings
+   - **Fix**: Ensure `Dockerfile`, `startup.sh`, and `sshd_config` use LF (Unix) line endings, not CRLF (Windows)
+   - The `.gitattributes` file enforces this, but check your editor settings
+   - Convert if needed: `dos2unix startup.sh` or `sed -i 's/\r$//' startup.sh`
+3. Verify the container is running: `az webapp show --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP --query state`
+4. Restart the app: `az webapp restart --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP`
+5. Wait 1-2 minutes and try SSH again
 
 **Alternative: Use Azure Portal SSH**
 1. Go to Azure Portal → App Service
