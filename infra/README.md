@@ -312,7 +312,7 @@ Error: Failed to get existing workspaces: containers.Client#ListBlobs:
 StatusCode=403 Code="AuthorizationPermissionMismatch"
 ```
 
-This means the GitHub Actions service principal doesn't have access to the Terraform state storage. Fix:
+This means the GitHub Actions service principal doesn't have access to the Terraform state storage. Fix with one of these options:
 
 **Option 1: Update Terraform configuration and re-apply**
 
@@ -352,6 +352,12 @@ az role assignment create \
   --assignee "$GITHUB_ACTIONS_SP_ID" \
   --role 'Storage Blob Data Contributor' \
   --scope "$STORAGE_ACCOUNT_ID"
+
+# Verify the role assignment was created
+az role assignment list \
+  --assignee "$GITHUB_ACTIONS_SP_ID" \
+  --scope "$STORAGE_ACCOUNT_ID" \
+  --query "[?roleDefinitionName=='Storage Blob Data Contributor']" -o table
 ```
 
 After granting access, wait 2-3 minutes for Azure AD to propagate the permissions, then retry the GitHub Actions workflow.
