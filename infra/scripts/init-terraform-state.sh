@@ -12,7 +12,7 @@ echo "=========================================="
 RESOURCE_GROUP_NAME="${TF_STATE_RESOURCE_GROUP:-rg-mlshop-tfstate}"
 STORAGE_ACCOUNT_NAME="${TF_STATE_STORAGE_ACCOUNT:-mlshoptfstate}"
 CONTAINER_NAME="${TF_STATE_CONTAINER:-tfstate}"
-LOCATION="${AZURE_LOCATION:-eastus}"
+LOCATION="${AZURE_LOCATION:-northeurope}"
 
 # Check if Azure CLI is installed
 if ! command -v az &> /dev/null; then
