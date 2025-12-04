@@ -24,6 +24,10 @@ RUN mkdir -p /var/run/sshd \
 # Copy SSH configuration for Azure App Service
 COPY sshd_config /etc/ssh/
 
+# Copy startup script early and set permissions
+COPY startup.sh /usr/local/bin/startup.sh
+RUN chmod +x /usr/local/bin/startup.sh
+
 COPY requirements.txt ./
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
@@ -33,9 +37,5 @@ RUN mkdir -p instance
 
 ENV PORT=8000
 EXPOSE 8000 2222
-
-# Copy startup script
-COPY startup.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/startup.sh
 
 CMD ["/usr/local/bin/startup.sh"]
