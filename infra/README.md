@@ -319,7 +319,7 @@ This means the GitHub Actions service principal doesn't have access to the Terra
 ```bash
 cd infra/terraform
 
-# Edit terraform.tfvars and ensure these lines are present:
+# Edit terraform.tfvars and ensure these lines are present (not commented):
 # tf_state_resource_group  = "rg-mlshop-tfstate"
 # tf_state_storage_account = "mlshoptfstate"
 
@@ -331,10 +331,10 @@ terraform apply
 
 ```bash
 # Set these variables to match your configuration
-PROJECT_NAME="mlshop"        # From terraform.tfvars
-ENVIRONMENT="prod"           # From terraform.tfvars
-TF_STATE_RG="rg-mlshop-tfstate"      # From init-terraform-state.sh
-TF_STATE_SA="mlshoptfstate"          # From init-terraform-state.sh
+PROJECT_NAME="mlshop"                # From terraform.tfvars (project_name)
+ENVIRONMENT="prod"                   # From terraform.tfvars (environment)
+TF_STATE_RG="rg-mlshop-tfstate"      # From init-terraform-state.sh (resource group)
+TF_STATE_SA="mlshoptfstate"          # From init-terraform-state.sh (storage account)
 
 # Get the GitHub Actions service principal ID
 GITHUB_ACTIONS_SP_ID=$(az ad sp list \
