@@ -131,6 +131,7 @@ cd ../terraform
 BACKEND_URL=$(terraform output -raw app_service_url)
 SWA_NAME=$(terraform output -raw static_web_app_name)
 SWA_TOKEN=$(terraform output -raw static_web_app_api_key)
+RESOURCE_GROUP=$(terraform output -raw resource_group_name)
 ```
 
 Build and deploy frontend:
@@ -140,8 +141,17 @@ cd ../../frontend
 npm install
 VITE_API_BASE_URL="$BACKEND_URL/api" npm run build
 
-# Deploy to Static Web App (requires SWA CLI or use GitHub Actions)
-echo "Deploy the frontend using GitHub Actions or manually upload dist/ to Static Web App"
+# Deploy using Azure Static Web Apps CLI
+npx @azure/static-web-apps-cli deploy \
+  --app-location . \
+  --output-location dist \
+  --deployment-token "$SWA_TOKEN"
+```
+
+**Alternative**: Use GitHub Actions workflow by pushing to main branch:
+```bash
+git push origin main
+# The deploy-frontend.yml workflow will automatically build and deploy
 ```
 
 ### 10. Test the Application
