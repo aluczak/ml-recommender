@@ -60,7 +60,7 @@ if [ ! -f "terraform.tfvars" ]; then
     cat <<EOF
 project_name              = "mlshop"
 environment               = "prod"
-location                  = "eastus"
+location                  = "northeurope"
 postgresql_admin_password = "your-secure-password"
 app_secret_key            = "your-secret-key"
 github_repository         = "aluczak/ml-recommender"

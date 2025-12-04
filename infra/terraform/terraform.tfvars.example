@@ -3,10 +3,10 @@
 
 project_name = "mlshop"
 environment  = "prod"
-location     = "eastus"
+location     = "northeurope"
 
 # Static Web App location (limited regions available)
-static_web_app_location = "eastus2"
+static_web_app_location = "westeurope"
 
 # Database configuration
 database_name = "mlshop"

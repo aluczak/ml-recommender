@@ -8,6 +8,7 @@ resource "azurerm_postgresql_flexible_server" "main" {
   administrator_login    = "psqladmin"
   administrator_password = var.admin_password
   zone                   = "1"
+  public_network_access_enabled = false  # Enforce private access when using delegated subnet
   
   storage_mb = 32768
   sku_name   = "B_Standard_B1ms"
@@ -22,12 +23,4 @@ resource "azurerm_postgresql_flexible_server_database" "main" {
   server_id = azurerm_postgresql_flexible_server.main.id
   collation = "en_US.utf8"
   charset   = "utf8"
-}
-
-# Firewall rule to allow Azure services (needed for App Service)
-resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_azure_services" {
-  name             = "AllowAzureServices"
-  server_id        = azurerm_postgresql_flexible_server.main.id
-  start_ip_address = "0.0.0.0"
-  end_ip_address   = "0.0.0.0"
 }
