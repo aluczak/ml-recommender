@@ -63,7 +63,13 @@ postgresql_admin_password = "PASTE_POSTGRES_PASSWORD_HERE"
 app_secret_key            = "PASTE_SECRET_KEY_HERE"
 github_repository         = "YOUR_USERNAME/ml-recommender"  # Change this!
 github_branch             = "main"
+
+# Required for GitHub Actions - must match values from step 1
+tf_state_resource_group  = "rg-mlshop-tfstate"
+tf_state_storage_account = "mlshoptfstate"
 ```
+
+**Note**: The `tf_state_*` variables are **required** for GitHub Actions to work. They grant the GitHub Actions service principal permission to access the Terraform state storage.
 
 ### 5. Deploy Infrastructure (5-10 minutes)
 

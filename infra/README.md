@@ -94,7 +94,16 @@ postgresql_admin_password = "YourSecurePassword123!"
 app_secret_key            = "YourSecretKey"
 github_repository         = "your-username/ml-recommender"
 github_branch             = "main"
+
+# Required for GitHub Actions to access Terraform state
+tf_state_resource_group  = "rg-mlshop-tfstate"
+tf_state_storage_account = "mlshoptfstate"
 ```
+
+**Important**: 
+- The `tf_state_*` variables must match the storage account created in Step 1
+- These variables are **required** for GitHub Actions to work with Terraform
+- If you skip these, GitHub Actions will fail with authentication errors
 
 **Important**: Generate secure random values for passwords and secrets:
 ```bash
@@ -294,6 +303,52 @@ Current configuration uses cost-effective tiers:
 ## Troubleshooting
 
 ### Terraform Errors
+
+**GitHub Actions authentication error (403 AuthorizationPermissionMismatch):**
+
+If GitHub Actions fails with:
+```
+Error: Failed to get existing workspaces: containers.Client#ListBlobs: 
+StatusCode=403 Code="AuthorizationPermissionMismatch"
+```
+
+This means the GitHub Actions service principal doesn't have access to the Terraform state storage. Fix:
+
+**Option 1: Update Terraform configuration and re-apply**
+
+```bash
+cd infra/terraform
+
+# Edit terraform.tfvars and ensure these lines are present:
+# tf_state_resource_group  = "rg-mlshop-tfstate"
+# tf_state_storage_account = "mlshoptfstate"
+
+# Re-apply Terraform to create the role assignment
+terraform apply
+```
+
+**Option 2: Manually grant access**
+
+```bash
+# Get the GitHub Actions service principal ID
+GITHUB_ACTIONS_SP_ID=$(az ad sp list \
+  --display-name 'mlshop-github-actions-prod' \
+  --query '[0].id' -o tsv)
+
+# Get the storage account ID
+STORAGE_ACCOUNT_ID=$(az storage account show \
+  --name mlshoptfstate \
+  --resource-group rg-mlshop-tfstate \
+  --query id -o tsv)
+
+# Grant Storage Blob Data Contributor role
+az role assignment create \
+  --assignee "$GITHUB_ACTIONS_SP_ID" \
+  --role 'Storage Blob Data Contributor' \
+  --scope "$STORAGE_ACCOUNT_ID"
+```
+
+After granting access, wait 2-3 minutes for Azure AD to propagate the permissions, then retry the GitHub Actions workflow.
 
 **State lock error:**
 ```bash

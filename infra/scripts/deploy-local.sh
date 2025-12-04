@@ -65,6 +65,10 @@ postgresql_admin_password = "your-secure-password"
 app_secret_key            = "your-secret-key"
 github_repository         = "aluczak/ml-recommender"
 github_branch             = "main"
+
+# Required for GitHub Actions to access Terraform state
+tf_state_resource_group  = "rg-mlshop-tfstate"
+tf_state_storage_account = "mlshoptfstate"
 EOF
     exit 1
 fi
