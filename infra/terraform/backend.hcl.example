@@ -6,3 +6,4 @@ resource_group_name  = "rg-mlshop-tfstate"
 storage_account_name = "mlshoptfstate"
 container_name       = "tfstate"
 key                  = "terraform.tfstate"
+use_azuread_auth     = true  # Use Azure AD auth instead of storage account keys

@@ -60,3 +60,15 @@ variable "tags" {
     ManagedBy   = "Terraform"
   }
 }
+
+variable "tf_state_resource_group" {
+  description = "Resource group name for Terraform state storage (optional, for granting GitHub Actions access)"
+  type        = string
+  default     = ""
+}
+
+variable "tf_state_storage_account" {
+  description = "Storage account name for Terraform state (optional, for granting GitHub Actions access)"
+  type        = string
+  default     = ""
+}

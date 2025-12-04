@@ -185,6 +185,21 @@ resource "azurerm_role_assignment" "github_actions_acr_push" {
   principal_id         = azuread_service_principal.github_actions.object_id
 }
 
+# Data source for Terraform state storage account (if configured)
+data "azurerm_storage_account" "tfstate" {
+  count               = var.tf_state_storage_account != "" && var.tf_state_resource_group != "" ? 1 : 0
+  name                = var.tf_state_storage_account
+  resource_group_name = var.tf_state_resource_group
+}
+
+# Assign Storage Blob Data Contributor role to GitHub Actions service principal for Terraform state
+resource "azurerm_role_assignment" "github_actions_tfstate" {
+  count                = var.tf_state_storage_account != "" && var.tf_state_resource_group != "" ? 1 : 0
+  scope                = data.azurerm_storage_account.tfstate[0].id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azuread_service_principal.github_actions.object_id
+}
+
 # Store GitHub Actions credentials in Key Vault
 resource "azurerm_key_vault_secret" "github_client_id" {
   name         = "github-client-id"
