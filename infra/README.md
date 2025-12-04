@@ -95,15 +95,10 @@ app_secret_key            = "YourSecretKey"
 github_repository         = "your-username/ml-recommender"
 github_branch             = "main"
 
-# Required for GitHub Actions to access Terraform state
-tf_state_resource_group  = "rg-mlshop-tfstate"
-tf_state_storage_account = "mlshoptfstate"
+# Optional: These are no longer required since we use storage account keys
+# tf_state_resource_group  = "rg-mlshop-tfstate"
+# tf_state_storage_account = "mlshoptfstate"
 ```
-
-**Important**: 
-- The `tf_state_*` variables must match the storage account created in Step 1
-- These variables are **required** for GitHub Actions to work with Terraform
-- If you skip these, GitHub Actions will fail with authentication errors
 
 **Important**: Generate secure random values for passwords and secrets:
 ```bash
@@ -203,6 +198,7 @@ Add these secrets to your GitHub repository (Settings → Secrets and variables 
 - `TF_STATE_RESOURCE_GROUP`: `rg-mlshop-tfstate`
 - `TF_STATE_STORAGE_ACCOUNT`: `mlshoptfstate`
 - `TF_STATE_CONTAINER`: `tfstate`
+- `TF_STATE_STORAGE_ACCESS_KEY`: Storage account access key (get with `az storage account keys list --resource-group rg-mlshop-tfstate --account-name mlshoptfstate --query '[0].value' -o tsv`)
 - `POSTGRESQL_ADMIN_PASSWORD`: Your PostgreSQL password
 - `APP_SECRET_KEY`: Your Flask secret key
 
@@ -303,64 +299,6 @@ Current configuration uses cost-effective tiers:
 ## Troubleshooting
 
 ### Terraform Errors
-
-**GitHub Actions authentication error (403 AuthorizationPermissionMismatch):**
-
-If GitHub Actions fails with:
-```
-Error: Failed to get existing workspaces: containers.Client#ListBlobs: 
-StatusCode=403 Code="AuthorizationPermissionMismatch"
-```
-
-This means the GitHub Actions service principal doesn't have access to the Terraform state storage. Fix with one of these options:
-
-**Option 1: Update Terraform configuration and re-apply**
-
-```bash
-cd infra/terraform
-
-# Edit terraform.tfvars and ensure these lines are present (not commented):
-# tf_state_resource_group  = "rg-mlshop-tfstate"
-# tf_state_storage_account = "mlshoptfstate"
-
-# Re-apply Terraform to create the role assignment
-terraform apply
-```
-
-**Option 2: Manually grant access**
-
-```bash
-# Set these variables to match your configuration (update with your actual values)
-PROJECT_NAME="mlshop"                # From terraform.tfvars (project_name) - default: "mlshop"
-ENVIRONMENT="prod"                   # From terraform.tfvars (environment) - default: "prod"
-TF_STATE_RG="rg-mlshop-tfstate"      # From init-terraform-state.sh (resource group) - default shown
-TF_STATE_SA="mlshoptfstate"          # From init-terraform-state.sh (storage account) - default shown
-
-# Get the GitHub Actions service principal ID
-GITHUB_ACTIONS_SP_ID=$(az ad sp list \
-  --display-name "${PROJECT_NAME}-github-actions-${ENVIRONMENT}" \
-  --query '[0].id' -o tsv)
-
-# Get the storage account ID
-STORAGE_ACCOUNT_ID=$(az storage account show \
-  --name "$TF_STATE_SA" \
-  --resource-group "$TF_STATE_RG" \
-  --query id -o tsv)
-
-# Grant Storage Blob Data Contributor role
-az role assignment create \
-  --assignee "$GITHUB_ACTIONS_SP_ID" \
-  --role 'Storage Blob Data Contributor' \
-  --scope "$STORAGE_ACCOUNT_ID"
-
-# Verify the role assignment was created
-az role assignment list \
-  --assignee "$GITHUB_ACTIONS_SP_ID" \
-  --scope "$STORAGE_ACCOUNT_ID" \
-  --query "[?roleDefinitionName=='Storage Blob Data Contributor']" -o table
-```
-
-After granting access, wait 2-3 minutes for Azure AD to propagate the permissions, then retry the GitHub Actions workflow.
 
 **State lock error:**
 ```bash

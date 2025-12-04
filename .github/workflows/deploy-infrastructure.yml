@@ -52,17 +52,17 @@ jobs:
         working-directory: ${{ env.WORKING_DIR }}
         env:
           ARM_USE_OIDC: true
-          ARM_USE_AZUREAD_AUTH: true
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          ARM_ACCESS_KEY: ${{ secrets.TF_STATE_STORAGE_ACCESS_KEY }}
         run: |
           cat > backend.hcl <<EOF
           resource_group_name  = "${{ secrets.TF_STATE_RESOURCE_GROUP }}"
           storage_account_name = "${{ secrets.TF_STATE_STORAGE_ACCOUNT }}"
           container_name       = "${{ secrets.TF_STATE_CONTAINER }}"
           key                  = "terraform.tfstate"
-          use_azuread_auth     = true
+          access_key           = "${{ secrets.TF_STATE_STORAGE_ACCESS_KEY }}"
           EOF
           terraform init -backend-config=backend.hcl
       
@@ -70,7 +70,6 @@ jobs:
         working-directory: ${{ env.WORKING_DIR }}
         env:
           ARM_USE_OIDC: true
-          ARM_USE_AZUREAD_AUTH: true
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -80,7 +79,6 @@ jobs:
         working-directory: ${{ env.WORKING_DIR }}
         env:
           ARM_USE_OIDC: true
-          ARM_USE_AZUREAD_AUTH: true
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -98,7 +96,6 @@ jobs:
         working-directory: ${{ env.WORKING_DIR }}
         env:
           ARM_USE_OIDC: true
-          ARM_USE_AZUREAD_AUTH: true
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -109,7 +106,6 @@ jobs:
         working-directory: ${{ env.WORKING_DIR }}
         env:
           ARM_USE_OIDC: true
-          ARM_USE_AZUREAD_AUTH: true
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -126,7 +122,6 @@ jobs:
         working-directory: ${{ env.WORKING_DIR }}
         env:
           ARM_USE_OIDC: true
-          ARM_USE_AZUREAD_AUTH: true
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}

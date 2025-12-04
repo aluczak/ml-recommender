@@ -64,12 +64,10 @@ app_secret_key            = "PASTE_SECRET_KEY_HERE"
 github_repository         = "YOUR_USERNAME/ml-recommender"  # Change this!
 github_branch             = "main"
 
-# Required for GitHub Actions - must match values from step 1
-tf_state_resource_group  = "rg-mlshop-tfstate"
-tf_state_storage_account = "mlshoptfstate"
+# Optional: These are no longer required since we use storage account keys
+# tf_state_resource_group  = "rg-mlshop-tfstate"
+# tf_state_storage_account = "mlshoptfstate"
 ```
-
-**Note**: The `tf_state_*` variables are **required** for GitHub Actions to work. They grant the GitHub Actions service principal permission to access the Terraform state storage.
 
 ### 5. Deploy Infrastructure (5-10 minutes)
 
@@ -212,6 +210,7 @@ Add these secrets:
 - `TF_STATE_RESOURCE_GROUP`: `rg-mlshop-tfstate`
 - `TF_STATE_STORAGE_ACCOUNT`: `mlshoptfstate`
 - `TF_STATE_CONTAINER`: `tfstate`
+- `TF_STATE_STORAGE_ACCESS_KEY`: Get with `az storage account keys list --resource-group rg-mlshop-tfstate --account-name mlshoptfstate --query '[0].value' -o tsv`
 - `POSTGRESQL_ADMIN_PASSWORD`: (your PostgreSQL password)
 - `APP_SECRET_KEY`: (your Flask secret key)
 
