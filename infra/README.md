@@ -94,6 +94,10 @@ postgresql_admin_password = "YourSecurePassword123!"
 app_secret_key            = "YourSecretKey"
 github_repository         = "your-username/ml-recommender"
 github_branch             = "main"
+
+# Optional: These are no longer required since we use storage account keys
+# tf_state_resource_group  = "rg-mlshop-tfstate"
+# tf_state_storage_account = "mlshoptfstate"
 ```
 
 **Important**: Generate secure random values for passwords and secrets:
@@ -194,6 +198,7 @@ Add these secrets to your GitHub repository (Settings → Secrets and variables 
 - `TF_STATE_RESOURCE_GROUP`: `rg-mlshop-tfstate`
 - `TF_STATE_STORAGE_ACCOUNT`: `mlshoptfstate`
 - `TF_STATE_CONTAINER`: `tfstate`
+- `TF_STATE_STORAGE_ACCESS_KEY`: Storage account access key (get with `az storage account keys list --resource-group rg-mlshop-tfstate --account-name mlshoptfstate --query '[0].value' -o tsv`)
 - `POSTGRESQL_ADMIN_PASSWORD`: Your PostgreSQL password
 - `APP_SECRET_KEY`: Your Flask secret key
 

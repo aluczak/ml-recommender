@@ -19,8 +19,9 @@ app_secret_key            = "CHANGE_ME_generate_random_secret_key"
 github_repository = "aluczak/ml-recommender"
 github_branch     = "main"
 
-# Terraform state storage (optional, for granting GitHub Actions access)
-# Leave empty if you don't want to grant GitHub Actions access to state storage
+# Terraform state storage (optional, no longer required since we use storage account keys)
+# These values are used to grant the GitHub Actions service principal access to the storage account
+# However, we now use storage account keys instead, so these are optional
 # tf_state_resource_group  = "rg-mlshop-tfstate"
 # tf_state_storage_account = "mlshoptfstate"
 
