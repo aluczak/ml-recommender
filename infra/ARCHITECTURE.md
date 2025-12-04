@@ -63,11 +63,11 @@ Azure Static Web App (HTTPS)
                                     │
                                     └─> Flask processes request
                                         │
-                                        └─> Query database via private network
+                                        └─> Query database via SSL
                                             │
                                             ▼
                                 PostgreSQL Flexible Server
-                                (Private IP only)
+                                (Public access, SSL required)
 ```
 
 ### Deployment Flow (CI/CD)
@@ -105,12 +105,6 @@ rg-mlshop-tfstate (State Storage)
 │       └── terraform.tfstate
 
 rg-mlshop-prod (Application Resources)
-├── Virtual Network: vnet-mlshop-prod
-│   ├── Subnet: snet-appservice (10.0.1.0/24)
-│   └── Subnet: snet-database (10.0.2.0/24)
-│
-├── Private DNS Zone: privatelink.postgres.database.azure.com
-│
 ├── Container Registry: acrmlshopxxxxxx
 │   ├── Repository: mlshop-backend
 │   └── Repository: mlshop-frontend
@@ -123,12 +117,12 @@ rg-mlshop-prod (Application Resources)
 │
 ├── App Service: app-mlshop-backend-xxxxxx
 │   ├── System-assigned Managed Identity
-│   ├── VNet Integration (snet-appservice)
 │   └── Docker Container from ACR
 │
 ├── PostgreSQL Server: psql-mlshop-xxxxxx
 │   ├── Database: mlshop
-│   ├── Private Endpoint (snet-database)
+│   ├── Public Access Enabled (training/dev)
+│   ├── Firewall: 0.0.0.0-255.255.255.255
 │   └── Administrator: psqladmin
 │
 └── Static Web App: swa-mlshop-prod
@@ -166,20 +160,20 @@ rg-mlshop-prod (Application Resources)
 │                                                               │
 │  Public Endpoints (HTTPS Only)                               │
 │  ├─> Static Web App (swa-mlshop-prod.azurestaticapps.net)  │
-│  └─> App Service (app-mlshop-backend-xxx.azurewebsites.net)│
-│                                                               │
-│  Private Endpoints (VNet Only)                               │
+│  ├─> App Service (app-mlshop-backend-xxx.azurewebsites.net)│
 │  └─> PostgreSQL (psql-mlshop-xxx.postgres.database.azure.com)│
-│      ├─> Only accessible via 10.0.2.0/24 subnet             │
-│      ├─> Private DNS resolution                             │
+│      ├─> Public access enabled (training/dev)               │
+│      ├─> Firewall: 0.0.0.0-255.255.255.255                  │
 │      └─> SSL/TLS required                                   │
 │                                                               │
 │  Firewall Rules                                              │
 │  ├─> App Service: Public HTTP/HTTPS                         │
-│  ├─> PostgreSQL: Azure Services only (0.0.0.0)              │
+│  ├─> PostgreSQL: All IP addresses (training/dev)            │
 │  └─> ACR: Authenticated access only                         │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+**Note**: This is a simplified configuration for training purposes. PostgreSQL is publicly accessible to simplify SSH access and troubleshooting. For production, see SECURITY_RECOMMENDATIONS.md for implementing VNet integration and private endpoints.
 
 ### Secrets Management
 
@@ -225,7 +219,7 @@ rg-mlshop-prod (Application Resources)
    └─> Flask app receives request
        └─> SQLAlchemy query
 
-4. PostgreSQL (via private network)
+4. PostgreSQL (over SSL)
    └─> Query database over SSL
        └─> Return results
 
@@ -250,7 +244,7 @@ rg-mlshop-prod (Application Resources)
    └─> Check user permissions
    └─> SQLAlchemy ORM insert
 
-4. PostgreSQL (via private network)
+4. PostgreSQL (over SSL)
    └─> INSERT via prepared statement
        └─> Transaction committed
 
@@ -408,7 +402,7 @@ Cost Alerts
 
 This architecture provides:
 
-✅ **Security**: Private networking, managed identities, no hardcoded secrets
+✅ **Security**: SSL/TLS encryption, managed identities, no hardcoded secrets (simplified for training)
 ✅ **Scalability**: Can scale vertically and horizontally as needed
 ✅ **Reliability**: Automated backups, versioned infrastructure
 ✅ **Cost-Effective**: ~$30-40/month for development/learning

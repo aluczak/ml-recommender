@@ -224,13 +224,6 @@ You can manually trigger deployments:
 
 ## Infrastructure Components
 
-### Networking
-
-- **Virtual Network**: Private network with subnets
-- **App Service Subnet**: For VNet integration
-- **Database Subnet**: For PostgreSQL
-- **Private DNS Zone**: For PostgreSQL private endpoint
-
 ### Container Registry
 
 - **SKU**: Basic (sufficient for this project)
@@ -241,7 +234,6 @@ You can manually trigger deployments:
 
 - **Plan**: B1 Linux
 - **Container**: Docker support enabled
-- **VNet Integration**: Connected to private network
 - **Health Check**: `/api/health` endpoint
 - **Managed Identity**: System-assigned for Key Vault access
 
@@ -250,9 +242,9 @@ You can manually trigger deployments:
 - **Version**: 16
 - **SKU**: B_Standard_B1ms (burstable, cost-effective)
 - **Storage**: 32 GB
-- **Private networking**: Delegated subnet
+- **Public access**: Enabled for training/development purposes
 - **SSL**: Required
-- **Firewall**: Allows Azure services
+- **Firewall**: Allows all IP addresses (0.0.0.0-255.255.255.255)
 
 ### Key Vault
 
@@ -278,11 +270,13 @@ You can manually trigger deployments:
 ## Security Considerations
 
 - **Secrets**: Stored in Key Vault, never in code
-- **Private Networking**: PostgreSQL accessible only via VNet
+- **Public Access**: PostgreSQL is publicly accessible for training purposes (should be restricted in production)
 - **SSL/TLS**: Required for all connections
 - **Managed Identity**: App Service uses system-assigned identity
 - **Federated Identity**: No long-lived credentials for GitHub Actions
 - **HTTPS Only**: Enforced on App Service and Static Web App
+
+**Note**: This configuration prioritizes ease of access for training over security. For production deployments, see SECURITY_RECOMMENDATIONS.md for implementing VNet integration and private endpoints.
 
 ## Cost Optimization
 
